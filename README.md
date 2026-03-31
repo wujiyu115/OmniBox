@@ -34,7 +34,6 @@ omnibox/
 │   ├── src/
 │   │   ├── commands/             # Tauri 命令处理器
 │   │   │   ├── search.rs         # 搜索命令（集成 PluginManager）
-│   │   │   ├── timestamp.rs      # 时间戳转换命令
 │   │   │   ├── plugin.rs         # 插件查询命令
 │   │   │   └── config.rs         # 配置命令
 │   │   ├── plugins/              # 插件系统

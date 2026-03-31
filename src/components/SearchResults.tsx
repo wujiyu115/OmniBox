@@ -31,8 +31,8 @@ export const SearchResults: React.FC = () => {
           selected={index === selectedIndex}
           onClick={() => {
             setSelectedIndex(index);
-            // 记录插件使用频率
-            invoke('record_usage', { pluginId: result.plugin_id }).catch(console.error);
+            // 记录插件使用频率（后端字段名为 plugin_id，前端类型定义为 pluginId）
+            invoke('record_usage', { pluginId: result.pluginId ?? (result as any).plugin_id }).catch(console.error);
             selectResult();
           }}
         />

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
+import { SettingsView } from './SettingsView';
+
+type TabType = 'plugins' | 'settings';
 
 interface PluginStatusInfo {
   id: string;
@@ -26,7 +29,64 @@ interface PluginCardData extends PluginInfo {
   dependents: string[];
 }
 
-export const PluginMarketView: React.FC = () => {
+interface PluginMarketViewProps {
+  initialTab?: TabType;
+}
+
+export const PluginMarketView: React.FC<PluginMarketViewProps> = ({ initialTab = 'plugins' }) => {
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+
+  return (
+    <div className="flex flex-col h-full bg-white dark:bg-gray-800 overflow-hidden">
+      {/* Tab 栏 */}
+      <div className="flex border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+        <TabButton
+          label="🧩 插件市场"
+          active={activeTab === 'plugins'}
+          onClick={() => setActiveTab('plugins')}
+        />
+        <TabButton
+          label="⚙️ 设置"
+          active={activeTab === 'settings'}
+          onClick={() => setActiveTab('settings')}
+        />
+      </div>
+
+      {/* Tab 内容 */}
+      <div className="flex-1 overflow-hidden">
+        {activeTab === 'plugins' && <PluginListPanel />}
+        {activeTab === 'settings' && <SettingsView />}
+      </div>
+    </div>
+  );
+};
+
+interface TabButtonProps {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}
+
+function TabButton({ label, active, onClick }: TabButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-5 py-2.5 text-sm font-medium transition-colors relative ${
+        active
+          ? 'text-blue-600 dark:text-blue-400'
+          : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+      }`}
+    >
+      {label}
+      {active && (
+        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500" />
+      )}
+    </button>
+  );
+}
+
+/** 插件列表面板（原 PluginMarketView 的核心内容） */
+const PluginListPanel: React.FC = () => {
   const [plugins, setPlugins] = useState<PluginCardData[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -41,9 +101,7 @@ export const PluginMarketView: React.FC = () => {
       setIsLoading(true);
       setError('');
 
-      // 获取插件基本信息（含图标）
       const infoResult = await invoke<{ success: boolean; data: PluginInfo[] }>('get_installed_plugins');
-      // 获取插件状态（含依赖检查）
       const statusResult = await invoke<{ success: boolean; data: PluginStatusInfo[] }>('get_plugin_status');
 
       if (infoResult.success && infoResult.data && statusResult.success && statusResult.data) {
@@ -79,7 +137,6 @@ export const PluginMarketView: React.FC = () => {
       const result = await invoke<{ success: boolean; error?: string }>(command, { id });
 
       if (result.success) {
-        // 重新加载插件状态
         await loadPlugins();
       } else if (result.error) {
         setError(result.error);
@@ -96,15 +153,9 @@ export const PluginMarketView: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-      {/* 标题栏 */}
-      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-        <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100">插件市场</h2>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">管理已安装的内置插件</p>
-      </div>
-
+    <div className="flex flex-col h-full overflow-hidden">
       {/* 搜索框 */}
-      <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+      <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
         <input
           type="text"
           placeholder="搜索插件..."
@@ -145,7 +196,7 @@ export const PluginMarketView: React.FC = () => {
       )}
 
       {/* 底部统计 */}
-      <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-400 dark:text-gray-500">
+      <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">
         共 {plugins.length} 个插件，已启用 {plugins.filter((p) => p.enabled).length} 个
       </div>
     </div>

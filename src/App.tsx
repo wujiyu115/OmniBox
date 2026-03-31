@@ -9,37 +9,23 @@ import { CalculatorView } from './views/CalculatorView';
 import { NotesView } from './views/NotesView';
 import { TranslateView } from './views/TranslateView';
 import { PluginMarketView } from './views/PluginMarketView';
-import { SettingsView } from './views/SettingsView';
 import { SyncSettingsView } from './views/SyncSettingsView';
 
-type ViewType = 'search' | 'timestamp' | 'calculator' | 'notes' | 'translate' | 'plugins' | 'sync' | 'settings';
-
-interface NavItem {
-  id: ViewType;
-  label: string;
-  icon: string;
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { id: 'search', label: '搜索', icon: '🔍' },
-  { id: 'timestamp', label: '时间戳', icon: '⏱️' },
-  { id: 'calculator', label: '计算器', icon: '🧮' },
-  { id: 'notes', label: '笔记', icon: '📝' },
-  { id: 'translate', label: '翻译', icon: '🌐' },
-  { id: 'plugins', label: '插件市场', icon: '🧩' },
-  { id: 'sync', label: '同步', icon: '🔄' },
-  { id: 'settings', label: '设置', icon: '⚙️' },
-];
+// 插件视图类型：search 是主搜索页，其余是具体功能插件页
+type PluginViewType = 'search' | 'timestamp' | 'calculator' | 'notes' | 'translate' | 'sync';
+// 全部视图类型（含插件市场/设置合并页）
+type ViewType = PluginViewType | 'plugins' | 'settings';
 
 function App() {
   const [currentView, setCurrentView] = useState<ViewType>('search');
 
   useEffect(() => {
-    // Listen for ESC key to hide window
+    // ESC 键隐藏窗口，同时回到搜索主页
     const handleKeyDown = async (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         const appWindow = getCurrentWindow();
         await invoke('hide_window', { window: appWindow });
+        setCurrentView('search');
       }
     };
 
@@ -48,62 +34,67 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // 监听来自 Rust 后端的 open-settings 事件，自动切换到设置页
-    const unlisten = listen('open-settings', () => {
+    // 托盘菜单：打开设置（跳转到插件市场的设置 Tab）
+    const unlistenSettings = listen('open-settings', () => {
       setCurrentView('settings');
     });
 
-    // 监听引导教学事件
-    const unlistenGuide = listen('open-guide', () => {
-      setCurrentView('search');
-    });
-
-    // 监听关于事件
+    // 托盘菜单：关于（跳转设置页）
     const unlistenAbout = listen('open-about', () => {
       setCurrentView('settings');
     });
 
     return () => {
-      unlisten.then((fn) => fn());
-      unlistenGuide.then((fn) => fn());
+      unlistenSettings.then((fn) => fn());
       unlistenAbout.then((fn) => fn());
     };
   }, []);
 
-  return (
-    <ThemeProvider>
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 transition-colors">
-        <div className="max-w-3xl mx-auto">
-          {/* View switch buttons */}
-          <div className="flex gap-2 mb-4 flex-wrap">
-            {NAV_ITEMS.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setCurrentView(item.id)}
-                className={`px-4 py-2 rounded flex items-center gap-1.5 text-sm ${
-                  currentView === item.id
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
-              </button>
-            ))}
+  // 插件市场/设置页：全屏展示，带返回按钮
+  if (currentView === 'plugins' || currentView === 'settings') {
+    return (
+      <ThemeProvider>
+        <div className="h-screen bg-white dark:bg-gray-900 flex flex-col overflow-hidden">
+          {/* 顶部返回栏 */}
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
+            <button
+              onClick={() => setCurrentView('search')}
+              className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
+            >
+              <span>←</span>
+              <span>返回</span>
+            </button>
           </div>
-
-          {/* Current view */}
-          <div className="h-[calc(100vh-100px)]">
-            {currentView === 'search' && <SearchView />}
-            {currentView === 'timestamp' && <TimestampView />}
-            {currentView === 'calculator' && <CalculatorView />}
-            {currentView === 'notes' && <NotesView />}
-            {currentView === 'translate' && <TranslateView />}
-            {currentView === 'plugins' && <PluginMarketView />}
-            {currentView === 'sync' && <SyncSettingsView />}
-            {currentView === 'settings' && <SettingsView />}
+          <div className="flex-1 overflow-hidden">
+            <PluginMarketView initialTab={currentView === 'settings' ? 'settings' : 'plugins'} />
           </div>
         </div>
+      </ThemeProvider>
+    );
+  }
+
+  // 搜索主页：高度自适应内容
+  if (currentView === 'search') {
+    return (
+      <ThemeProvider>
+        <div className="bg-white dark:bg-gray-900">
+          <SearchView onNavigate={setCurrentView} />
+        </div>
+      </ThemeProvider>
+    );
+  }
+
+  // 插件功能页面：撑满全屏
+  return (
+    <ThemeProvider>
+      <div className="h-screen bg-white dark:bg-gray-900 flex flex-col overflow-hidden">
+        <main className="flex-1 overflow-hidden">
+          {currentView === 'timestamp' && <TimestampView />}
+          {currentView === 'calculator' && <CalculatorView />}
+          {currentView === 'notes' && <NotesView />}
+          {currentView === 'translate' && <TranslateView />}
+          {currentView === 'sync' && <SyncSettingsView />}
+        </main>
       </div>
     </ThemeProvider>
   );

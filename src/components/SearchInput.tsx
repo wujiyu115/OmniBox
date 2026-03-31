@@ -1,7 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import { useSearchStore } from '../stores';
 
-export const SearchInput: React.FC = () => {
+interface SearchInputProps {
+  onIconClick?: () => void;
+}
+
+export const SearchInput: React.FC<SearchInputProps> = ({ onIconClick }) => {
   const { query, setQuery, search, clearSearch } = useSearchStore();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -11,6 +15,7 @@ export const SearchInput: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
+    setTimeout(() => search(), 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -21,7 +26,13 @@ export const SearchInput: React.FC = () => {
 
   return (
     <div className="relative flex items-center w-full px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-      <span className="text-xl mr-3">🔍</span>
+      <button
+        onClick={onIconClick}
+        className="text-xl mr-3 hover:scale-110 transition-transform cursor-pointer"
+        title="打开插件市场"
+      >
+        🔍
+      </button>
       <input
         ref={inputRef}
         type="text"

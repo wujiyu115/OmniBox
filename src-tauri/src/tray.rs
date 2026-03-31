@@ -6,32 +6,22 @@ use tauri::{
 
 pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     // 构建托盘菜单
-    let help_doc = MenuItem::with_id(app, "help_doc", "帮助文档", true, None::<&str>)?;
-    let guide = MenuItem::with_id(app, "guide", "引导教学", true, None::<&str>)?;
-    let feedback = MenuItem::with_id(app, "feedback", "意见反馈", true, None::<&str>)?;
-    let sep1 = PredefinedMenuItem::separator(app)?;
     let show = MenuItem::with_id(app, "show", "显示", true, None::<&str>)?;
     let settings = MenuItem::with_id(app, "settings", "系统设置", true, None::<&str>)?;
-    let sep2 = PredefinedMenuItem::separator(app)?;
-    let quit = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;
-    let restart = MenuItem::with_id(app, "restart", "重启", true, None::<&str>)?;
-    let sep3 = PredefinedMenuItem::separator(app)?;
+    let sep1 = PredefinedMenuItem::separator(app)?;
     let about = MenuItem::with_id(app, "about", "关于", true, None::<&str>)?;
+    let restart = MenuItem::with_id(app, "restart", "重启", true, None::<&str>)?;
+    let quit = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;
 
     let menu = Menu::with_items(
         app,
         &[
-            &help_doc,
-            &guide,
-            &feedback,
-            &sep1,
             &show,
             &settings,
-            &sep2,
-            &quit,
-            &restart,
-            &sep3,
+            &sep1,
             &about,
+            &restart,
+            &quit,
         ],
     )?;
 
@@ -87,19 +77,6 @@ fn handle_menu_event(app: &AppHandle, id: &str) {
         }
         "restart" => {
             app.restart();
-        }
-        "help_doc" => {
-            let _ = open_url_in_browser("https://omnibox.docs.example.com");
-        }
-        "feedback" => {
-            let _ = open_url_in_browser("https://omnibox.feedback.example.com");
-        }
-        "guide" => {
-            if let Some(window) = app.get_webview_window("main") {
-                let _ = window.show();
-                let _ = window.set_focus();
-                let _ = window.emit("open-guide", ());
-            }
         }
         "about" => {
             if let Some(window) = app.get_webview_window("main") {

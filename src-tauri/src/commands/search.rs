@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use crate::commands::ApiResponse;
+use crate::commands::config::load_config_from_file;
 use crate::plugins::manager::PluginManager;
 use crate::usage::UsageTracker;
 
@@ -112,12 +113,20 @@ pub async fn search(request: SearchRequest) -> ApiResponse<Vec<SearchResult>> {
     // 加载使用频率追踪器
     let tracker = UsageTracker::new();
 
+    // 加载插件启用/禁用状态配置
+    let config = load_config_from_file();
+
     // 解析多关键词
     let keywords = parse_query_keywords(&query);
 
     let mut results: Vec<SearchResult> = Vec::new();
 
     for plugin in &plugins {
+        // 跳过已禁用的插件（默认为启用）
+        let is_enabled = config.plugin_states.get(&plugin.id).copied().unwrap_or(true);
+        if !is_enabled {
+            continue;
+        }
         for (cmd_idx, cmd) in plugin.commands.iter().enumerate() {
             let match_score = if keywords.is_empty() {
                 1.0
