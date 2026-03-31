@@ -1,0 +1,65 @@
+# 工作树
+.worktrees/
+
+# ===== Node.js / Frontend =====
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Vite 缓存
+.vite/
+
+# TypeScript 构建缓存
+*.tsbuildinfo
+
+# ===== Rust / Tauri =====
+src-tauri/target/
+
+# Tauri 生成的资源（gen 目录下的平台特定文件）
+src-tauri/gen/android/
+src-tauri/gen/apple/
+
+# ===== 系统文件 =====
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ===== 编辑器 / IDE =====
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ===== 日志 =====
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===== 环境变量 =====
+.env
+.env.local
+.env.*.local
+
+# ===== 包管理器锁文件（按需保留） =====
+# 如果使用 yarn，取消下一行注释
+# yarn.lock
+
