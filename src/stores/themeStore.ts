@@ -32,12 +32,20 @@ export const useThemeStore = create<ThemeState>((set) => ({
   colorScheme: DEFAULT_COLOR_SCHEME,
   isDark: false,
 
-  setColorScheme: (schemeId: string) => {
+  setColorScheme: async (schemeId: string) => {
     const scheme = getColorScheme(schemeId);
     applyColorScheme(schemeId);
     set({ colorScheme: schemeId, isDark: scheme.isDark });
-    // 持久化到后端配置
-    invoke('update_config', { config: { theme: schemeId, language: 'zh-CN' } }).catch(console.error);
+    // 持久化到后端配置：先获取完整配置，再只修改 theme 字段后回写
+    try {
+      const result = await invoke<{ success: boolean; data: Record<string, unknown> }>('get_config');
+      if (result.success && result.data) {
+        const fullConfig = { ...result.data, theme: schemeId };
+        await invoke('update_config', { config: fullConfig });
+      }
+    } catch (e) {
+      console.error('Failed to persist color scheme:', e);
+    }
   },
 
   initColorScheme: async () => {

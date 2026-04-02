@@ -86,9 +86,10 @@ fn save_config_to_file(config: &AppConfig) -> Result<(), String> {
 
 /// 验证配置合法性
 fn validate_config(config: &AppConfig) -> Result<(), String> {
-    // 验证主题值
-    if config.theme != "light" && config.theme != "dark" {
-        return Err(format!("无效的主题值: {}，仅支持 'light' 或 'dark'", config.theme));
+    // 验证主题值（支持 8 种配色方案 + 旧值 light 兼容）
+    let valid_themes = ["blue", "green", "purple", "orange", "rose", "gray", "dark", "midnight", "light"];
+    if !valid_themes.contains(&config.theme.as_str()) {
+        return Err(format!("无效的主题值: {}，仅支持 {:?}", config.theme, valid_themes));
     }
 
     // 验证语言值

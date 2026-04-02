@@ -13,6 +13,26 @@ html {
   background-color: var(--bg-primary, #f3f4f6);
 }
 
+/* 兜底：未设置配色方案时使用默认蓝（必须在 .theme-xxx 之前，确保被覆盖） */
+:root {
+  --bg-primary: #f3f4f6;
+  --bg-secondary: #e5e7eb;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f9fafb;
+  --bg-input: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: #e5e7eb;
+  --border-light: #f3f4f6;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-text: #ffffff;
+  --success: #22c55e;
+  --error: #ef4444;
+  --is-dark: 0;
+}
+
 /* ========== 8 种配色方案 CSS 变量 ========== */
 
 /* 浅色方案：默认蓝 */
@@ -173,26 +193,6 @@ html {
   --success: #22c55e;
   --error: #f87171;
   --is-dark: 1;
-}
-
-/* 兜底：未设置配色方案时使用默认蓝 */
-:root {
-  --bg-primary: #f3f4f6;
-  --bg-secondary: #e5e7eb;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f9fafb;
-  --bg-input: #ffffff;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
-  --border-color: #e5e7eb;
-  --border-light: #f3f4f6;
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
-  --accent-text: #ffffff;
-  --success: #22c55e;
-  --error: #ef4444;
-  --is-dark: 0;
 }
 
 /* 全局主题过渡动画 */
