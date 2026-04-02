@@ -1,0 +1,29 @@
+{
+  "pluginName": "omnibox-calculator",
+  "pluginType": "ui",
+  "description": "快速计算表达式",
+  "main": "index.html",
+  "version": "1.0.0",
+  "logo": "🧮",
+  "features": [
+    {
+      "code": "calculator",
+      "explain": "输入表达式计算",
+      "cmds": [
+        {
+          "label": "计算器",
+          "type": "text",
+          "keyword": "calc"
+        }
+      ]
+    }
+  ],
+  "lifecycle": {
+    "onLoad": "onPluginLoad",
+    "onActivate": "onPluginActivate",
+    "onDeactivate": "onPluginDeactivate",
+    "onUnload": "onPluginUnload"
+  },
+  "permissions": [],
+  "dependencies": []
+}

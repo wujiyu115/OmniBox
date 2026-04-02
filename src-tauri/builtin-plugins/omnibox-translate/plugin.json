@@ -1,0 +1,29 @@
+{
+  "pluginName": "omnibox-translate",
+  "pluginType": "ui",
+  "description": "中英文互译（MyMemory API）",
+  "main": "index.html",
+  "version": "1.0.0",
+  "logo": "🌐",
+  "features": [
+    {
+      "code": "translate",
+      "explain": "中英文互译",
+      "cmds": [
+        {
+          "label": "翻译",
+          "type": "text",
+          "keyword": "tr"
+        }
+      ]
+    }
+  ],
+  "lifecycle": {
+    "onLoad": "onPluginLoad",
+    "onActivate": "onPluginActivate",
+    "onDeactivate": "onPluginDeactivate",
+    "onUnload": "onPluginUnload"
+  },
+  "permissions": ["http"],
+  "dependencies": []
+}

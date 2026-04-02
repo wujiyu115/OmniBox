@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 根元素兜底背景色，防止深色模式下露出白色 */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: #f3f4f6;
+}
+
+html.dark {
+  background-color: #111827;
+}
+
 /* 明暗主题 CSS 变量 */
 :root {
   --bg-primary: #f3f4f6;

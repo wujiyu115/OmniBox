@@ -1,0 +1,29 @@
+{
+  "pluginName": "omnibox-notes",
+  "pluginType": "ui",
+  "description": "创建和管理 Markdown 笔记",
+  "main": "index.html",
+  "version": "1.0.0",
+  "logo": "📝",
+  "features": [
+    {
+      "code": "notes",
+      "explain": "Markdown 笔记管理",
+      "cmds": [
+        {
+          "label": "笔记",
+          "type": "text",
+          "keyword": "note"
+        }
+      ]
+    }
+  ],
+  "lifecycle": {
+    "onLoad": "onPluginLoad",
+    "onActivate": "onPluginActivate",
+    "onDeactivate": "onPluginDeactivate",
+    "onUnload": "onPluginUnload"
+  },
+  "permissions": ["storage"],
+  "dependencies": []
+}

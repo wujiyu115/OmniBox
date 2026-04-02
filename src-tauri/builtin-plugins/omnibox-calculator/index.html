@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>计算器</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #1a1a1a; }
+    .dark body { background: #1f2937; color: #f3f4f6; }
+    .dark .input-box { background: #374151; border-color: #4b5563; color: #f3f4f6; }
+    .dark .result-area { border-color: #374151; }
+    .dark .result-value { color: #f3f4f6; }
+    .dark .btn { background: #374151; border-color: #4b5563; color: #d1d5db; }
+    .dark .btn:hover { background: #4b5563; }
+    .dark .btn-primary { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+    .dark .btn-primary:hover { background: #2563eb; }
+    .dark .btn-success { background: #22c55e; border-color: #22c55e; }
+    .dark .btn-success:hover { background: #16a34a; }
+    .dark .history-item { border-color: #374151; }
+    .dark .history-item:hover { background: #374151; }
+    .dark .history-header { border-color: #374151; color: #6b7280; }
+    .dark .error-text { color: #f87171; }
+    .dark .hint-text { color: #6b7280; }
+    .dark .label-text { color: #9ca3af; }
+    .dark .expr-text { color: #d1d5db; }
+    .dark .result-text { color: #f3f4f6; }
+
+    .input-area { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; }
+    .input-row { display: flex; align-items: center; gap: 8px; }
+    .label-text { font-size: 14px; color: #6b7280; width: 48px; flex-shrink: 0; }
+    .input-box { flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; outline: none; font-family: monospace; font-size: 14px; }
+    .input-box:focus { border-color: #3b82f6; }
+    .btn { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer; font-size: 14px; background: #f9fafb; color: #6b7280; }
+    .btn:hover { background: #f3f4f6; }
+    .btn-primary { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-success { background: #22c55e; border-color: #22c55e; color: #fff; }
+    .btn-success:hover { background: #16a34a; }
+
+    .result-area { padding: 16px; border-bottom: 1px solid #e5e7eb; min-height: 80px; display: flex; align-items: center; }
+    .result-value { font-size: 28px; font-weight: bold; font-family: monospace; color: #1f2937; }
+    .result-actions { display: flex; gap: 8px; margin-left: auto; }
+    .error-text { color: #ef4444; font-size: 14px; }
+    .hint-text { color: #9ca3af; font-size: 14px; }
+
+    .history-header { padding: 8px 16px; font-size: 11px; color: #9ca3af; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #f3f4f6; }
+    .history-list { overflow-y: auto; flex: 1; }
+    .history-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f3f4f6; }
+    .history-item:hover { background: #f9fafb; }
+    .expr-text { font-family: monospace; font-size: 14px; color: #4b5563; }
+    .result-text { font-family: monospace; font-size: 14px; font-weight: 600; color: #1f2937; margin-left: 16px; }
+
+    .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #9ca3af; }
+    .empty-icon { font-size: 24px; }
+    .empty-hint { font-size: 14px; }
+
+    .container { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="input-area">
+      <div class="input-row">
+        <span class="label-text">表达式</span>
+        <input id="expr" class="input-box" type="text" placeholder="例如：(1 + 2) * 3, sqrt(16), 2 ^ 10" autofocus>
+        <button class="btn" onclick="clearAll()">清空</button>
+      </div>
+    </div>
+
+    <div class="result-area" id="resultArea">
+      <span class="hint-text">输入表达式后自动计算</span>
+    </div>
+
+    <div id="historySection" style="display:none; flex:1; overflow:hidden; display:flex; flex-direction:column;">
+      <div class="history-header">历史记录（最近 10 条）</div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
+    <div class="empty-state" id="emptyState">
+      <span class="empty-icon">🧮</span>
+      <span class="empty-hint">支持：四则运算、括号、幂运算 (^)、sqrt、sin、cos 等</span>
+    </div>
+  </div>
+
+  <script>
+    const exprInput = document.getElementById('expr');
+    const resultArea = document.getElementById('resultArea');
+    const historySection = document.getElementById('historySection');
+    const historyList = document.getElementById('historyList');
+    const emptyState = document.getElementById('emptyState');
+
+    let currentResult = '';
+    let history = [];
+    let copied = false;
+
+    // 表达式求值器
+    function evaluate(expression) {
+      let expr = expression.trim();
+      if (!expr) throw new Error('空表达式');
+
+      // 替换数学函数
+      expr = expr.replace(/sqrt\(/gi, 'Math.sqrt(');
+      expr = expr.replace(/sin\(/gi, 'Math.sin(');
+      expr = expr.replace(/cos\(/gi, 'Math.cos(');
+      expr = expr.replace(/tan\(/gi, 'Math.tan(');
+      expr = expr.replace(/abs\(/gi, 'Math.abs(');
+      expr = expr.replace(/floor\(/gi, 'Math.floor(');
+      expr = expr.replace(/ceil\(/gi, 'Math.ceil(');
+      expr = expr.replace(/round\(/gi, 'Math.round(');
+      expr = expr.replace(/log\(/gi, 'Math.log(');
+      expr = expr.replace(/log10\(/gi, 'Math.log10(');
+      expr = expr.replace(/log2\(/gi, 'Math.log2(');
+      expr = expr.replace(/\bpi\b/gi, 'Math.PI');
+      expr = expr.replace(/\be\b/gi, 'Math.E');
+      // 幂运算 ^ → **
+      expr = expr.replace(/\^/g, '**');
+
+      // 安全检查：只允许数字、运算符、括号、Math 方法
+      const sanitized = expr.replace(/Math\.\w+/g, '').replace(/[\d\s+\-*/.()%,]/g, '');
+      if (sanitized.length > 0) {
+        throw new Error('包含不安全字符: ' + sanitized);
+      }
+
+      const result = new Function('return (' + expr + ')')();
+      if (typeof result !== 'number' || !isFinite(result)) {
+        throw new Error('计算结果无效');
+      }
+
+      // 处理浮点精度
+      return parseFloat(result.toPrecision(15)).toString();
+    }
+
+    let debounceTimer = null;
+    exprInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const expr = exprInput.value.trim();
+        if (!expr) {
+          currentResult = '';
+          renderResult();
+          return;
+        }
+        try {
+          currentResult = evaluate(expr);
+          renderResult();
+        } catch (e) {
+          currentResult = '';
+          resultArea.innerHTML = '<span class="error-text">' + escapeHtml(e.message) + '</span>';
+        }
+      }, 150);
+    });
+
+    exprInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') confirmResult();
+    });
+
+    function renderResult() {
+      if (currentResult) {
+        resultArea.innerHTML = `
+          <span class="result-value">${escapeHtml(currentResult)}</span>
+          <div class="result-actions">
+            <button class="btn btn-primary" onclick="copyResult()">复制</button>
+            <button class="btn btn-success" onclick="confirmResult()">确认并记录</button>
+          </div>
+        `;
+      } else {
+        resultArea.innerHTML = '<span class="hint-text">输入表达式后自动计算</span>';
+      }
+    }
+
+    function copyResult() {
+      if (currentResult) {
+        window.omnibox.copyToClipboard(currentResult);
+      }
+    }
+
+    function confirmResult() {
+      if (!currentResult || !exprInput.value.trim()) return;
+      history.unshift({ expression: exprInput.value.trim(), result: currentResult });
+      if (history.length > 10) history.pop();
+      window.omnibox.copyToClipboard(currentResult);
+      exprInput.value = '';
+      currentResult = '';
+      renderResult();
+      renderHistory();
+      exprInput.focus();
+    }
+
+    function clearAll() {
+      exprInput.value = '';
+      currentResult = '';
+      renderResult();
+      exprInput.focus();
+    }
+
+    function loadHistory(idx) {
+      exprInput.value = history[idx].expression;
+      exprInput.focus();
+      exprInput.dispatchEvent(new Event('input'));
+    }
+
+    function renderHistory() {
+      if (history.length === 0) {
+        historySection.style.display = 'none';
+        emptyState.style.display = 'flex';
+        return;
+      }
+      historySection.style.display = 'flex';
+      emptyState.style.display = 'none';
+      historyList.innerHTML = history.map((item, idx) =>
+        `<div class="history-item" onclick="loadHistory(${idx})">
+          <span class="expr-text">${escapeHtml(item.expression)}</span>
+          <span class="result-text">= ${escapeHtml(item.result)}</span>
+        </div>`
+      ).join('');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // 生命周期钩子
+    window.onPluginLoad = () => console.log('[Calculator] loaded');
+    window.onPluginActivate = () => exprInput.focus();
+    window.onPluginDeactivate = () => {};
+    window.onPluginUnload = () => {};
+  </script>
+</body>
+</html>

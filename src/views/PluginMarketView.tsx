@@ -20,6 +20,8 @@ interface PluginInfo {
   version: string;
   description: string;
   icon?: string;
+  plugin_type: string;
+  features: { code: string; explain: string; cmds: { label: string; type: string; keyword: string }[] }[];
 }
 
 interface PluginCardData extends PluginInfo {
@@ -101,16 +103,23 @@ const PluginListPanel: React.FC = () => {
       setIsLoading(true);
       setError('');
 
-      const infoResult = await invoke<{ success: boolean; data: PluginInfo[] }>('get_installed_plugins');
       const statusResult = await invoke<{ success: boolean; data: PluginStatusInfo[] }>('get_plugin_status');
 
-      if (infoResult.success && infoResult.data && statusResult.success && statusResult.data) {
+      if (statusResult.success && statusResult.data) {
+        // 插件市场使用 get_builtin_plugins 获取所有插件（含禁用的），确保可以重新启用
+        const allPlugins = await invoke<{ id: string; name: string; version: string; description: string; logo?: string; plugin_type: string; features: PluginInfo['features'] }[]>('get_builtin_plugins');
         const statusMap = new Map(statusResult.data.map((s) => [s.id, s]));
         setPlugins(
-          infoResult.data.map((p) => {
+          allPlugins.map((p) => {
             const status = statusMap.get(p.id);
             return {
-              ...p,
+              id: p.id,
+              name: p.name,
+              version: p.version,
+              description: p.description,
+              icon: p.logo || undefined,
+              plugin_type: p.plugin_type,
+              features: p.features,
               enabled: status ? status.status === 'enabled' : true,
               status: status?.status || 'enabled',
               missing_deps: status?.missing_deps || [],
@@ -231,6 +240,9 @@ const PluginCardComponent: React.FC<PluginCardProps> = ({ plugin, onToggle }) =>
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{plugin.name}</span>
           <span className="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">v{plugin.version}</span>
+          {plugin.plugin_type === 'system' && (
+            <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded flex-shrink-0">系统</span>
+          )}
           {isDependencyMissing && (
             <span className="text-xs text-yellow-600 dark:text-yellow-400 flex-shrink-0">⚠ 依赖缺失</span>
           )}

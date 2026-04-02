@@ -9,8 +9,7 @@ pub mod tray;
 pub mod usage;
 pub mod window;
 
-use commands::{search, plugin, config, plugin_manage, sync as sync_commands, timestamp, system};
-use plugins::{calculator, notes, translate};
+use commands::{search, plugin, config, plugin_manage, sync as sync_commands, system};
 use window::{show_window, hide_window, toggle_window, is_window_visible};
 use tauri::{Manager, AppHandle};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut};
@@ -46,13 +45,10 @@ pub fn run() {
             plugin::get_plugin,
             config::get_config,
             config::update_config,
-            timestamp::convert_timestamp_command,
-            calculator::calculate,
-            notes::list_notes,
-            notes::get_note,
-            notes::save_note,
-            notes::delete_note,
-            translate::translate,
+            plugins::manager::get_builtin_plugins,
+            plugins::manager::get_plugins_dir,
+            plugins::manager::get_plugin_html,
+            plugins::manager::get_all_plugin_html,
             plugin_manage::enable_plugin,
             plugin_manage::disable_plugin,
             plugin_manage::get_plugin_status,
@@ -68,6 +64,15 @@ pub fn run() {
             is_window_visible,
         ])
         .setup(|app| {
+            // 确保插件目录存在
+            let manager = plugins::PluginManager::new();
+            manager.ensure_plugins_dir();
+
+            // 安装内置插件：从资源目录复制到用户插件目录
+            let resource_dir = app.path().resource_dir()
+                .unwrap_or_else(|_| std::path::PathBuf::from("."));
+            manager.install_builtin_plugins(&resource_dir);
+
             window::setup_window_shortcuts(app)?;
             setup_global_shortcuts(&app.handle())?;
             tray::setup_tray(&app.handle())?;

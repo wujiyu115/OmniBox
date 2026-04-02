@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown 笔记</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #1a1a1a; }
+    .dark body { background: #1f2937; color: #f3f4f6; }
+    .dark .sidebar { background: #111827; border-color: #374151; }
+    .dark .search-input { background: #1f2937; border-color: #4b5563; color: #f3f4f6; }
+    .dark .note-item { border-color: #374151; }
+    .dark .note-item:hover { background: #1f2937; }
+    .dark .note-item.active { background: rgba(59,130,246,0.15); }
+    .dark .btn-new { background: #3b82f6; }
+    .dark .btn-new:hover { background: #2563eb; }
+    .dark .toolbar { border-color: #374151; }
+    .dark .title-input { color: #f3f4f6; }
+    .dark .title-input:focus { border-color: #60a5fa; }
+    .dark .mode-btn { background: #374151; color: #d1d5db; }
+    .dark .mode-btn:hover { background: #4b5563; }
+    .dark .mode-btn.active { background: #3b82f6; color: #fff; }
+    .dark .btn-save { background: #22c55e; }
+    .dark .btn-save:hover { background: #16a34a; }
+    .dark .editor { background: #1f2937; color: #f3f4f6; }
+    .dark .preview { color: #f3f4f6; }
+    .dark .btn-delete { color: #9ca3af; }
+    .dark .btn-delete:hover { color: #ef4444; }
+    .dark .error-bar { background: rgba(127,29,29,0.3); border-color: #991b1b; color: #f87171; }
+    .dark .empty-hint { color: #6b7280; }
+
+    .container { display: flex; height: 100vh; overflow: hidden; }
+
+    /* 左侧列表 */
+    .sidebar { width: 224px; display: flex; flex-direction: column; border-right: 1px solid #e5e7eb; background: #f9fafb; flex-shrink: 0; }
+    .sidebar-header { padding: 8px; border-bottom: 1px solid #e5e7eb; display: flex; gap: 4px; }
+    .search-input { flex: 1; padding: 6px 8px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 4px; outline: none; }
+    .search-input:focus { border-color: #3b82f6; }
+    .btn-new { padding: 6px 8px; background: #3b82f6; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    .btn-new:hover { background: #2563eb; }
+    .note-list { flex: 1; overflow-y: auto; }
+    .note-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
+    .note-item:hover { background: #f3f4f6; }
+    .note-item.active { background: #eff6ff; border-left: 2px solid #3b82f6; }
+    .note-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .btn-delete { display: none; background: none; border: none; cursor: pointer; font-size: 12px; color: #9ca3af; margin-left: 4px; }
+    .note-item:hover .btn-delete { display: inline; }
+    .btn-delete:hover { color: #ef4444; }
+
+    /* 右侧编辑器 */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid #e5e7eb; }
+    .title-input { flex: 1; font-size: 16px; font-weight: 600; outline: none; border: none; border-bottom: 1px solid transparent; padding: 2px 0; background: transparent; color: #1a1a1a; }
+    .title-input:focus { border-bottom-color: #3b82f6; }
+    .mode-btn { padding: 4px 12px; font-size: 14px; border: none; border-radius: 4px; cursor: pointer; background: #f3f4f6; color: #4b5563; }
+    .mode-btn:hover { background: #e5e7eb; }
+    .mode-btn.active { background: #3b82f6; color: #fff; }
+    .btn-save { padding: 4px 12px; font-size: 14px; border: none; border-radius: 4px; cursor: pointer; background: #22c55e; color: #fff; }
+    .btn-save:hover { background: #16a34a; }
+    .btn-save:disabled { opacity: 0.5; }
+
+    .editor { width: 100%; height: 100%; padding: 16px; font-family: monospace; font-size: 14px; outline: none; resize: none; border: none; background: #fff; color: #1a1a1a; }
+    .preview { width: 100%; height: 100%; padding: 16px; overflow-y: auto; font-size: 14px; line-height: 1.6; }
+    .preview h1 { font-size: 24px; margin: 16px 0 8px; }
+    .preview h2 { font-size: 20px; margin: 14px 0 6px; }
+    .preview h3 { font-size: 16px; margin: 12px 0 4px; }
+    .preview p { margin: 8px 0; }
+    .preview code { background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 13px; }
+    .preview pre { background: #f3f4f6; padding: 12px; border-radius: 6px; overflow-x: auto; margin: 8px 0; }
+    .preview pre code { background: none; padding: 0; }
+    .preview ul, .preview ol { padding-left: 24px; margin: 8px 0; }
+    .preview blockquote { border-left: 3px solid #d1d5db; padding-left: 12px; color: #6b7280; margin: 8px 0; }
+
+    .content-area { flex: 1; overflow: hidden; }
+    .empty-hint { color: #9ca3af; font-size: 14px; }
+    .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+    .error-bar { padding: 8px 16px; font-size: 12px; color: #ef4444; border-top: 1px solid #fecaca; background: #fef2f2; }
+
+    /* 确认删除对话框 */
+    .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 100; }
+    .confirm-box { background: #fff; border-radius: 8px; padding: 20px 24px; min-width: 280px; box-shadow: 0 4px 24px rgba(0,0,0,0.15); text-align: center; }
+    .dark .confirm-box { background: #374151; color: #f3f4f6; }
+    .confirm-title { font-size: 15px; margin-bottom: 16px; }
+    .confirm-actions { display: flex; gap: 8px; justify-content: center; }
+    .confirm-btn { padding: 6px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    .confirm-btn-cancel { background: #e5e7eb; color: #4b5563; }
+    .confirm-btn-cancel:hover { background: #d1d5db; }
+    .dark .confirm-btn-cancel { background: #4b5563; color: #d1d5db; }
+    .dark .confirm-btn-cancel:hover { background: #6b7280; }
+    .confirm-btn-delete { background: #ef4444; color: #fff; }
+    .confirm-btn-delete:hover { background: #dc2626; }
+  </style>
+</head>
+<body>
+  <!-- 确认删除对话框 -->
+  <div class="confirm-overlay" id="confirmDialog">
+    <div class="confirm-box">
+      <div class="confirm-title" id="confirmDeleteTitle">确认删除该笔记？</div>
+      <div class="confirm-actions">
+        <button class="confirm-btn confirm-btn-cancel" onclick="cancelDelete()">取消</button>
+        <button class="confirm-btn confirm-btn-delete" onclick="confirmDelete()">删除</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- 左侧笔记列表 -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <input id="searchInput" class="search-input" type="text" placeholder="搜索笔记...">
+        <button class="btn-new" onclick="createNote()" title="新建笔记">+</button>
+      </div>
+      <div class="note-list" id="noteList">
+        <div style="padding:16px; text-align:center;" class="empty-hint">暂无笔记，点击 + 新建</div>
+      </div>
+    </div>
+
+    <!-- 右侧编辑区 -->
+    <div class="main" id="mainArea">
+      <div class="empty-state" id="emptyEditor">
+        <span style="font-size:28px;">📝</span>
+        <span class="empty-hint">选择一篇笔记或点击 + 新建</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ---- IndexedDB 存储层 ---- */
+    const DB_NAME = 'omnibox-notes';
+    const STORE_NAME = 'notes';
+    let db = null;
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = (e) => {
+          const database = e.target.result;
+          if (!database.objectStoreNames.contains(STORE_NAME)) {
+            const store = database.createObjectStore(STORE_NAME, { keyPath: 'id' });
+            store.createIndex('updated_at', 'updated_at', { unique: false });
+          }
+        };
+        request.onsuccess = (e) => { db = e.target.result; resolve(db); };
+        request.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    function getAllNotes() {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const request = store.getAll();
+        request.onsuccess = () => {
+          const notes = request.result.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+          resolve(notes);
+        };
+        request.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    function getNote(id) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const request = tx.objectStore(STORE_NAME).get(id);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    function putNote(note) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const request = tx.objectStore(STORE_NAME).put(note);
+        request.onsuccess = () => resolve();
+        request.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    function deleteNoteDB(id) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const request = tx.objectStore(STORE_NAME).delete(id);
+        request.onsuccess = () => resolve();
+        request.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    /* ---- 应用状态 ---- */
+    let notes = [];
+    let selectedId = null;
+    let currentTitle = '';
+    let currentContent = '';
+    let editorMode = 'edit'; // 'edit' | 'preview'
+    let saving = false;
+
+    const searchInput = document.getElementById('searchInput');
+    const noteListEl = document.getElementById('noteList');
+    const mainArea = document.getElementById('mainArea');
+
+    searchInput.addEventListener('input', renderNoteList);
+
+    /* ---- 渲染 ---- */
+    async function loadNotes() {
+      notes = await getAllNotes();
+      renderNoteList();
+    }
+
+    function renderNoteList() {
+      const query = searchInput.value.toLowerCase();
+      const filtered = notes.filter(n => n.title.toLowerCase().includes(query));
+
+      if (filtered.length === 0) {
+        noteListEl.innerHTML = `<div style="padding:16px; text-align:center;" class="empty-hint">${query ? '无匹配笔记' : '暂无笔记，点击 + 新建'}</div>`;
+        return;
+      }
+
+      noteListEl.innerHTML = filtered.map(note =>
+        `<div class="note-item ${note.id === selectedId ? 'active' : ''}" onclick="selectNote('${note.id}')">
+          <span class="note-title">${escapeHtml(note.title)}</span>
+          <button class="btn-delete" onclick="event.stopPropagation(); deleteNote('${note.id}')" title="删除">✕</button>
+        </div>`
+      ).join('');
+    }
+
+    function renderEditor() {
+      if (selectedId === null && !currentTitle) {
+        mainArea.innerHTML = `
+          <div class="empty-state" id="emptyEditor">
+            <span style="font-size:28px;">📝</span>
+            <span class="empty-hint">选择一篇笔记或点击 + 新建</span>
+          </div>`;
+        return;
+      }
+
+      mainArea.innerHTML = `
+        <div class="toolbar">
+          <input id="titleInput" class="title-input" type="text" value="${escapeAttr(currentTitle)}" placeholder="笔记标题" oninput="currentTitle=this.value">
+          <button class="mode-btn ${editorMode === 'edit' ? 'active' : ''}" onclick="setMode('edit')">编辑</button>
+          <button class="mode-btn ${editorMode === 'preview' ? 'active' : ''}" onclick="setMode('preview')">预览</button>
+          <button class="btn-save" onclick="saveNote()" ${saving ? 'disabled' : ''}>${saving ? '保存中...' : '保存'}</button>
+        </div>
+        <div class="content-area">
+          ${editorMode === 'edit'
+            ? `<textarea class="editor" id="editorArea" placeholder="使用 Markdown 编写笔记..." oninput="currentContent=this.value">${escapeHtml(currentContent)}</textarea>`
+            : `<div class="preview" id="previewArea">${renderMarkdown(currentContent)}</div>`
+          }
+        </div>`;
+    }
+
+    /* ---- 操作 ---- */
+    async function selectNote(id) {
+      const note = await getNote(id);
+      if (!note) return;
+      selectedId = id;
+      currentTitle = note.title;
+      currentContent = note.content;
+      editorMode = 'edit';
+      renderNoteList();
+      renderEditor();
+    }
+
+    function createNote() {
+      selectedId = null;
+      currentTitle = '新建笔记';
+      currentContent = '';
+      editorMode = 'edit';
+      renderEditor();
+    }
+
+    async function saveNote() {
+      if (!currentTitle.trim()) return;
+      saving = true;
+      renderEditor();
+
+      const now = new Date().toISOString();
+      const note = {
+        id: selectedId || generateId(),
+        title: currentTitle.trim(),
+        content: currentContent,
+        created_at: selectedId ? (await getNote(selectedId))?.created_at || now : now,
+        updated_at: now,
+      };
+
+      await putNote(note);
+      selectedId = note.id;
+      saving = false;
+      await loadNotes();
+      renderEditor();
+    }
+
+    let pendingDeleteId = null;
+
+    function deleteNote(id) {
+      pendingDeleteId = id;
+      const note = notes.find(n => n.id === id);
+      const title = note ? note.title : '该笔记';
+      document.getElementById('confirmDeleteTitle').textContent = `确认删除「${title}」？`;
+      document.getElementById('confirmDialog').style.display = 'flex';
+    }
+
+    async function confirmDelete() {
+      if (!pendingDeleteId) return;
+      const id = pendingDeleteId;
+      pendingDeleteId = null;
+      document.getElementById('confirmDialog').style.display = 'none';
+      await deleteNoteDB(id);
+      if (selectedId === id) {
+        selectedId = null;
+        currentTitle = '';
+        currentContent = '';
+      }
+      await loadNotes();
+      renderEditor();
+    }
+
+    function cancelDelete() {
+      pendingDeleteId = null;
+      document.getElementById('confirmDialog').style.display = 'none';
+    }
+
+    function setMode(mode) {
+      editorMode = mode;
+      renderEditor();
+    }
+
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+
+    /* ---- 简易 Markdown 渲染 ---- */
+    function renderMarkdown(text) {
+      if (!text) return '<p class="empty-hint">暂无内容</p>';
+      let html = escapeHtml(text);
+      // 代码块
+      html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+      // 行内代码
+      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+      // 标题
+      html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+      html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+      html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+      // 粗体和斜体
+      html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      // 引用
+      html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
+      // 无序列表
+      html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+      html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+      // 段落
+      html = html.replace(/\n\n/g, '</p><p>');
+      html = html.replace(/\n/g, '<br>');
+      html = '<p>' + html + '</p>';
+      // 清理空段落
+      html = html.replace(/<p><\/p>/g, '');
+      html = html.replace(/<p>(<h[123]>)/g, '$1');
+      html = html.replace(/(<\/h[123]>)<\/p>/g, '$1');
+      html = html.replace(/<p>(<pre>)/g, '$1');
+      html = html.replace(/(<\/pre>)<\/p>/g, '$1');
+      html = html.replace(/<p>(<ul>)/g, '$1');
+      html = html.replace(/(<\/ul>)<\/p>/g, '$1');
+      html = html.replace(/<p>(<blockquote>)/g, '$1');
+      html = html.replace(/(<\/blockquote>)<\/p>/g, '$1');
+      return html;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function escapeAttr(text) {
+      return text.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /* ---- 初始化 ---- */
+    openDB().then(() => loadNotes());
+
+    // 生命周期钩子
+    window.onPluginLoad = () => console.log('[Notes] loaded');
+    window.onPluginActivate = () => {};
+    window.onPluginDeactivate = () => {};
+    window.onPluginUnload = () => {};
+  </script>
+</body>
+</html>

@@ -218,35 +218,191 @@ invoke('is_window_visible') => boolean
 
 ## 插件系统扩展
 
-### 添加新内置插件
+OmniBox 采用**纯前端插件架构**，每个插件是一个独立目录，包含 `plugin.json` 描述文件和 `index.html` 入口页面。插件通过 iframe 加载，与主窗口通过 `postMessage` 通信，SDK 由宿主自动注入，无需手动引用。
 
-1. 在 `src-tauri/src/plugins/` 下创建新的 `.rs` 文件，实现 `#[tauri::command]` 函数
-2. 在 `src-tauri/src/plugins/mod.rs` 中添加 `pub mod your_plugin;`
-3. 在 `src-tauri/src/plugins/manager.rs` 的 `get_builtin_plugins()` 中注册插件信息
-4. 在 `src-tauri/src/lib.rs` 的 `invoke_handler` 中注册命令
-5. 在 `src/views/` 下创建对应的前端视图组件
-6. 在 `src/App.tsx` 中添加路由
+### 创建一个插件
 
-### Plugin 数据结构
+#### 1. 创建插件目录
 
-```rust
-pub struct Plugin {
-    pub id: String,          // 唯一标识符，如 "omnibox-calculator"
-    pub name: String,        // 显示名称
-    pub version: String,     // 版本号
-    pub description: String, // 描述
-    pub main: String,        // 入口文件（保留字段）
-    pub commands: Vec<Command>, // 命令列表
-    pub permissions: Vec<String>, // 权限声明
-}
+在插件目录下创建以你的插件 ID 命名的文件夹，包含两个文件：
 
-pub struct Command {
-    pub label: String,       // 命令显示名称
-    pub keyword: String,     // 搜索关键词
-    pub explain: String,     // 命令说明
-    pub icon: Option<String>, // 图标（emoji）
+```
+my-plugin/
+├── plugin.json      # 插件描述文件
+└── index.html       # 插件入口页面
+```
+
+#### 2. 编写 plugin.json
+
+```json
+{
+  "pluginName": "my-plugin",
+  "pluginType": "ui",
+  "description": "我的自定义插件",
+  "main": "index.html",
+  "version": "1.0.0",
+  "logo": "🚀",
+  "features": [
+    {
+      "code": "my-feature",
+      "explain": "功能说明",
+      "cmds": [
+        {
+          "label": "我的插件",
+          "type": "text",
+          "keyword": "myplugin"
+        }
+      ]
+    }
+  ],
+  "lifecycle": {
+    "onLoad": "onPluginLoad",
+    "onActivate": "onPluginActivate",
+    "onDeactivate": "onPluginDeactivate",
+    "onUnload": "onPluginUnload"
+  },
+  "permissions": [],
+  "dependencies": []
 }
 ```
+
+**字段说明：**
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `pluginName` | string | 插件唯一标识符 |
+| `pluginType` | string | 插件类型，目前固定为 `"ui"` |
+| `description` | string | 插件描述 |
+| `main` | string | 入口 HTML 文件名 |
+| `version` | string | 版本号 |
+| `logo` | string | 图标（支持 emoji） |
+| `features` | array | 功能列表，每个功能包含 `code`、`explain` 和 `cmds`（搜索命令） |
+| `lifecycle` | object | 生命周期钩子函数名映射 |
+| `permissions` | array | 权限声明（预留） |
+| `dependencies` | array | 依赖声明（预留） |
+
+`features[].cmds[]` 中的 `keyword` 用于搜索匹配——用户在搜索框输入该关键词即可找到并打开你的插件。
+
+#### 3. 编写 index.html
+
+插件页面是一个标准的 HTML 文件，运行在 iframe 沙箱中。**无需手动引用 SDK**，宿主会自动注入。
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>我的插件</title>
+  <style>
+    /* 亮色主题样式 */
+    body { background: #fff; color: #1a1a1a; }
+
+    /* 暗色主题样式：使用 .dark 选择器 */
+    .dark body { background: #1f2937; color: #f3f4f6; }
+  </style>
+</head>
+<body>
+  <div id="app">Hello OmniBox Plugin!</div>
+
+  <script>
+    // 生命周期钩子（函数名需与 plugin.json 中 lifecycle 字段一致）
+    window.onPluginLoad = () => {
+      console.log('插件已加载');
+    };
+
+    window.onPluginActivate = () => {
+      console.log('插件已激活');
+    };
+
+    window.onPluginDeactivate = () => {
+      console.log('插件已停用');
+    };
+
+    window.onPluginUnload = () => {
+      console.log('插件已卸载');
+    };
+  </script>
+</body>
+</html>
+```
+
+#### 4. 主题适配
+
+插件**必须使用 `.dark` CSS 选择器**来适配暗色主题，而非 `@media (prefers-color-scheme: dark)`。宿主会在主题切换时自动在 `<html>` 标签上添加/移除 `dark` class。
+
+```css
+/* ✅ 正确：使用 .dark 选择器 */
+.dark body { background: #1f2937; color: #f3f4f6; }
+.dark .my-card { background: #374151; border-color: #4b5563; }
+
+/* ❌ 错误：不要使用 media query */
+@media (prefers-color-scheme: dark) { ... }
+```
+
+#### 5. 安装插件
+
+将插件目录复制到用户插件目录即可：
+
+| 平台 | 路径 |
+|------|------|
+| Windows | `%APPDATA%\omnibox\plugins\` |
+| macOS | `~/Library/Application Support/omnibox/plugins/` |
+| Linux | `~/.config/omnibox/plugins/` |
+
+重启应用后，插件会自动被发现和加载。
+
+### SDK API
+
+宿主自动注入的 `window.omnibox` 对象提供以下 API：
+
+| 方法 | 返回值 | 说明 |
+|------|--------|------|
+| `omnibox.copyToClipboard(text)` | `Promise<void>` | 复制文本到系统剪贴板 |
+| `omnibox.notify(message)` | `Promise<void>` | 发送通知消息 |
+| `omnibox.getConfig()` | `Promise<object>` | 获取插件配置 |
+| `omnibox.setConfig(config)` | `Promise<void>` | 保存插件配置 |
+| `omnibox.getTheme()` | `Promise<{theme: string}>` | 获取当前主题（`"dark"` 或 `"light"`） |
+| `omnibox.close()` | `Promise<void>` | 关闭插件页面，返回搜索视图 |
+
+**使用示例：**
+
+```javascript
+// 复制计算结果到剪贴板
+document.getElementById('copyBtn').onclick = async () => {
+  await window.omnibox.copyToClipboard('Hello from my plugin!');
+};
+
+// 关闭插件
+document.getElementById('backBtn').onclick = () => {
+  window.omnibox.close();
+};
+
+// 获取当前主题
+const { theme } = await window.omnibox.getTheme();
+console.log('当前主题:', theme);
+```
+
+### 生命周期
+
+插件的生命周期由宿主管理，按以下顺序触发：
+
+```
+插件加载 → onLoad → onActivate → [用户交互] → onDeactivate → onUnload
+```
+
+| 钩子 | 触发时机 | 典型用途 |
+|------|----------|----------|
+| `onLoad` | 插件 iframe 就绪后 | 初始化数据、绑定事件 |
+| `onActivate` | 插件页面显示时 | 聚焦输入框、刷新数据 |
+| `onDeactivate` | 插件页面隐藏时 | 保存状态、清理定时器 |
+| `onUnload` | 插件被卸载时 | 释放资源 |
+
+### 开发注意事项
+
+- **不要手动引用 SDK**：`omnibox-plugin-api.js` 由宿主自动注入，无需 `<script src="...">` 引用
+- **使用 `.dark` 主题选择器**：宿主通过 postMessage 同步主题，自动在 `<html>` 上切换 `dark` class
+- **iframe 沙箱限制**：插件运行在 `sandbox="allow-scripts allow-same-origin allow-popups allow-forms"` 的 iframe 中
+- **所有逻辑纯前端实现**：插件无法直接调用 Tauri 后端命令，需通过 SDK API 与宿主通信
 
 ## 开发设置
 

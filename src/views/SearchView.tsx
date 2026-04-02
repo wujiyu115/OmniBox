@@ -3,13 +3,6 @@ import { SearchInput } from '../components/SearchInput';
 import { SearchResults } from '../components/SearchResults';
 import { useSearchStore, usePluginStore } from '../stores';
 
-// 后端插件 ID → 前端 ViewType 映射
-const PLUGIN_VIEW_MAP: Record<string, string> = {
-  'omnibox-timestamp': 'timestamp',
-  'omnibox-calculator': 'calculator',
-  'omnibox-notes': 'notes',
-  'omnibox-translate': 'translate',
-};
 
 interface SearchViewProps {
   onNavigate: (view: string) => void;
@@ -48,10 +41,7 @@ export const SearchView: React.FC<SearchViewProps> = ({ onNavigate }) => {
   const hasQuery = query.trim().length > 0;
 
   const handlePluginClick = (pluginId: string) => {
-    const viewType = PLUGIN_VIEW_MAP[pluginId];
-    if (viewType) {
-      onNavigate(viewType);
-    }
+    onNavigate(`plugin:${pluginId}`);
   };
 
   return (

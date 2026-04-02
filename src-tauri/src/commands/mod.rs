@@ -1,6 +1,3 @@
-// Re-export timestamp plugin
-pub use crate::plugins::timestamp;
-
 pub mod search;
 pub mod plugin;
 pub mod config;

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use crate::commands::ApiResponse;
 use crate::commands::config::load_config_from_file;
-use crate::plugins::manager::PluginManager;
+use crate::plugins::manager::{Feature, PluginManager};
 use crate::usage::UsageTracker;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -179,21 +179,27 @@ pub struct PluginInfo {
     pub version: String,
     pub description: String,
     pub icon: Option<String>,
+    pub plugin_type: String,
+    pub features: Vec<Feature>,
 }
 
 #[tauri::command]
 pub async fn get_installed_plugins() -> ApiResponse<Vec<PluginInfo>> {
     let manager = PluginManager::new();
     let plugins = manager.get_builtin_plugins();
+    let config = load_config_from_file();
 
     let plugin_infos: Vec<PluginInfo> = plugins
         .into_iter()
+        .filter(|p| config.plugin_states.get(&p.id).copied().unwrap_or(true))
         .map(|p| PluginInfo {
             id: p.id,
             name: p.name,
             version: p.version,
             description: p.description,
-            icon: p.commands.first().and_then(|c| c.icon.clone()),
+            icon: p.logo.clone(),
+            plugin_type: p.plugin_type,
+            features: p.features,
         })
         .collect();
 

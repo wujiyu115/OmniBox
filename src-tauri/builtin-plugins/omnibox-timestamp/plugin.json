@@ -1,0 +1,29 @@
+{
+  "pluginName": "omnibox-timestamp",
+  "pluginType": "ui",
+  "description": "时间戳与日期时间互转",
+  "main": "index.html",
+  "version": "1.0.0",
+  "logo": "⏱️",
+  "features": [
+    {
+      "code": "timestamp",
+      "explain": "时间戳转换工具",
+      "cmds": [
+        {
+          "label": "时间戳",
+          "type": "text",
+          "keyword": "ts"
+        }
+      ]
+    }
+  ],
+  "lifecycle": {
+    "onLoad": "onPluginLoad",
+    "onActivate": "onPluginActivate",
+    "onDeactivate": "onPluginDeactivate",
+    "onUnload": "onPluginUnload"
+  },
+  "permissions": [],
+  "dependencies": []
+}

@@ -1,7 +1,6 @@
-pub mod calculator;
 pub mod manager;
-pub mod notes;
-pub mod timestamp;
-pub mod translate;
 
-pub use manager::{get_builtin_plugins, get_plugin_info, Command, Plugin};
+pub use manager::{
+    get_all_plugin_html, get_builtin_plugins, get_plugin_html, get_plugin_info, get_plugins_dir,
+    Cmd, Command, Feature, Lifecycle, Plugin, PluginManifest, PluginManager,
+};

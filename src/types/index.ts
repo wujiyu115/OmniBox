@@ -7,12 +7,26 @@ export interface SearchResult {
   score: number;
 }
 
+export interface PluginCmd {
+  label: string;
+  type: string;
+  keyword: string;
+}
+
+export interface PluginFeature {
+  code: string;
+  explain: string;
+  cmds: PluginCmd[];
+}
+
 export interface Plugin {
   id: string;
   name: string;
   version: string;
   description: string;
   icon?: string;
+  plugin_type: string;
+  features: PluginFeature[];
 }
 
 export interface SearchRequest {

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>时间戳转换</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #1a1a1a; }
+    .dark body { background: #1f2937; color: #f3f4f6; }
+    .dark .row { border-color: #374151; }
+    .dark .label { color: #9ca3af; }
+    .dark .input-box, .dark .select-box { background: #374151; border-color: #4b5563; color: #f3f4f6; }
+    .dark .btn { background: #374151; border-color: #4b5563; color: #d1d5db; }
+    .dark .btn:hover { background: #4b5563; }
+    .dark .btn-copy { background: #3b82f6; border-color: #3b82f6; }
+    .dark .btn-copy:hover { background: #2563eb; }
+    .dark .value { color: #f3f4f6; }
+    .dark .format-table { border-color: #374151; }
+    .dark .format-row { border-color: #374151; }
+    .dark .format-row:hover { background: #374151; }
+    .dark .format-label { color: #9ca3af; }
+    .dark .format-value { color: #f3f4f6; }
+    .dark .hint-text { color: #6b7280; }
+    .dark .error-text { color: #f87171; }
+
+    .container { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+    .row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid #e5e7eb; }
+    .label { width: 48px; font-size: 14px; color: #4b5563; flex-shrink: 0; }
+    .input-box { flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; outline: none; font-family: monospace; font-size: 14px; }
+    .input-box:focus { border-color: #3b82f6; }
+    .select-box { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; outline: none; font-size: 14px; margin-left: 8px; }
+    .select-box:focus { border-color: #3b82f6; }
+    .btn { padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer; font-size: 14px; background: #f9fafb; color: #4b5563; margin-left: 8px; }
+    .btn:hover { background: #f3f4f6; }
+    .btn-copy { padding: 4px 12px; background: #3b82f6; border: 1px solid #3b82f6; color: #fff; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .btn-copy:hover { background: #2563eb; }
+
+    .ts-row { display: flex; align-items: center; padding: 10px 16px; border-bottom: 1px solid #e5e7eb; }
+    .ts-label { width: 48px; font-size: 14px; color: #6b7280; flex-shrink: 0; }
+    .value { flex: 1; font-family: monospace; font-size: 14px; color: #1f2937; }
+
+    .format-table { flex: 1; overflow-y: auto; }
+    .format-header { padding: 8px 16px; font-size: 11px; color: #9ca3af; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #f3f4f6; }
+    .format-row { display: flex; align-items: center; padding: 8px 16px; border-bottom: 1px solid #f3f4f6; cursor: pointer; }
+    .format-row:hover { background: #f9fafb; }
+    .format-label { width: 200px; font-size: 13px; color: #6b7280; flex-shrink: 0; }
+    .format-value { flex: 1; font-family: monospace; font-size: 13px; color: #1f2937; }
+
+    .hint-text { color: #9ca3af; font-size: 14px; }
+    .error-text { color: #ef4444; font-size: 14px; padding: 12px 16px; }
+    .empty-state { flex: 1; display: flex; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 时区选择 -->
+    <div class="row">
+      <span class="label">时区</span>
+      <select id="timezone" class="select-box" style="flex:1; margin-left:0;">
+        <option value="UTC">UTC</option>
+        <option value="Asia/Shanghai" selected>UTC+08:00 Asia/Shanghai - 上海</option>
+        <option value="Asia/Tokyo">UTC+09:00 Asia/Tokyo - 东京</option>
+        <option value="America/New_York">UTC-05:00 America/New_York - 纽约</option>
+        <option value="Europe/London">UTC+00:00 Europe/London - 伦敦</option>
+      </select>
+    </div>
+
+    <!-- 输入 -->
+    <div class="row">
+      <span class="label">输入</span>
+      <input id="input" class="input-box" type="text" placeholder="1739221200" autofocus>
+      <button class="btn" onclick="clearInput()">清空</button>
+    </div>
+
+    <!-- 转换结果 -->
+    <div id="results" style="display:none;">
+      <div class="ts-row">
+        <span class="ts-label">秒</span>
+        <span class="value" id="valSeconds"></span>
+        <button class="btn-copy" onclick="copyValue('valSeconds')">复制</button>
+      </div>
+      <div class="ts-row">
+        <span class="ts-label">毫秒</span>
+        <span class="value" id="valMillis"></span>
+        <button class="btn-copy" onclick="copyValue('valMillis')">复制</button>
+      </div>
+      <div class="ts-row">
+        <span class="ts-label">纳秒</span>
+        <span class="value" id="valNanos"></span>
+        <button class="btn-copy" onclick="copyValue('valNanos')">复制</button>
+      </div>
+      <div class="format-table" id="formatTable"></div>
+    </div>
+
+    <div id="errorArea" class="error-text" style="display:none;"></div>
+
+    <div class="empty-state" id="emptyState">
+      <span class="hint-text">输入时间戳或日期开始转换</span>
+    </div>
+  </div>
+
+  <script>
+    const inputEl = document.getElementById('input');
+    const timezoneEl = document.getElementById('timezone');
+    const resultsEl = document.getElementById('results');
+    const errorArea = document.getElementById('errorArea');
+    const emptyState = document.getElementById('emptyState');
+
+    let debounceTimer = null;
+
+    inputEl.addEventListener('input', scheduleConvert);
+    timezoneEl.addEventListener('change', scheduleConvert);
+
+    function scheduleConvert() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(convert, 300);
+    }
+
+    function convert() {
+      const raw = inputEl.value.trim();
+      if (!raw) {
+        resultsEl.style.display = 'none';
+        errorArea.style.display = 'none';
+        emptyState.style.display = 'flex';
+        return;
+      }
+
+      try {
+        const parsed = parseInput(raw);
+        const timezone = timezoneEl.value;
+        renderResult(parsed, timezone);
+        resultsEl.style.display = 'block';
+        errorArea.style.display = 'none';
+        emptyState.style.display = 'none';
+      } catch (e) {
+        resultsEl.style.display = 'none';
+        errorArea.style.display = 'block';
+        errorArea.textContent = e.message;
+        emptyState.style.display = 'none';
+      }
+    }
+
+    function parseInput(raw) {
+      // 尝试解析为数字（时间戳）
+      const num = Number(raw);
+      if (!isNaN(num) && raw.match(/^\d+$/)) {
+        const len = raw.length;
+        if (len <= 10) {
+          // 秒级时间戳
+          return new Date(num * 1000);
+        } else if (len <= 13) {
+          // 毫秒级时间戳
+          return new Date(num);
+        } else if (len <= 16) {
+          // 微秒级时间戳
+          return new Date(num / 1000);
+        } else {
+          // 纳秒级时间戳
+          return new Date(num / 1000000);
+        }
+      }
+
+      // 尝试解析为日期字符串
+      const date = new Date(raw);
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+
+      // 尝试常见中文格式
+      const cnMatch = raw.match(/(\d{4})[年/-](\d{1,2})[月/-](\d{1,2})[日]?\s*(\d{1,2})?[时:.]?(\d{1,2})?[分:.]?(\d{1,2})?/);
+      if (cnMatch) {
+        const [, y, m, d, h, min, s] = cnMatch;
+        const date = new Date(Number(y), Number(m) - 1, Number(d), Number(h || 0), Number(min || 0), Number(s || 0));
+        if (!isNaN(date.getTime())) return date;
+      }
+
+      throw new Error('无法识别的输入格式');
+    }
+
+    function renderResult(date, timezone) {
+      const epochMs = date.getTime();
+      const epochSec = Math.floor(epochMs / 1000);
+      const epochNano = epochMs * 1000000;
+
+      document.getElementById('valSeconds').textContent = epochSec.toString();
+      document.getElementById('valMillis').textContent = epochMs.toString();
+      document.getElementById('valNanos').textContent = epochNano.toString();
+
+      const formats = [
+        { format: 'ISO 8601', value: date.toISOString() },
+        { format: '本地时间', value: date.toLocaleString('zh-CN', { timeZone: timezone }) },
+        { format: 'YYYY-MM-DD HH:mm:ss', value: formatDate(date, timezone) },
+        { format: 'YYYY/MM/DD', value: formatDate(date, timezone, 'date-slash') },
+        { format: 'Unix 时间戳 (秒)', value: epochSec.toString() },
+        { format: 'Unix 时间戳 (毫秒)', value: epochMs.toString() },
+        { format: '星期', value: date.toLocaleDateString('zh-CN', { timeZone: timezone, weekday: 'long' }) },
+        { format: 'UTC 时间', value: date.toUTCString() },
+      ];
+
+      const formatTable = document.getElementById('formatTable');
+      formatTable.innerHTML = '<div class="format-header">格式化输出</div>' +
+        formats.map(f =>
+          `<div class="format-row" onclick="loadToInput('${escapeAttr(f.value)}')">
+            <span class="format-label">${escapeHtml(f.format)}</span>
+            <span class="format-value">${escapeHtml(f.value)}</span>
+          </div>`
+        ).join('');
+    }
+
+    function formatDate(date, timezone, style) {
+      const options = { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+      const parts = new Intl.DateTimeFormat('zh-CN', options).formatToParts(date);
+      const get = (type) => (parts.find(p => p.type === type) || {}).value || '';
+
+      if (style === 'date-slash') {
+        return `${get('year')}/${get('month')}/${get('day')}`;
+      }
+      return `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')}:${get('second')}`;
+    }
+
+    function copyValue(elementId) {
+      const text = document.getElementById(elementId).textContent;
+      window.omnibox.copyToClipboard(text);
+    }
+
+    function loadToInput(value) {
+      inputEl.value = value;
+      inputEl.dispatchEvent(new Event('input'));
+    }
+
+    function clearInput() {
+      inputEl.value = '';
+      resultsEl.style.display = 'none';
+      errorArea.style.display = 'none';
+      emptyState.style.display = 'flex';
+      inputEl.focus();
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function escapeAttr(text) {
+      return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
+    }
+
+    // 生命周期钩子
+    window.onPluginLoad = () => console.log('[Timestamp] loaded');
+    window.onPluginActivate = () => inputEl.focus();
+    window.onPluginDeactivate = () => {};
+    window.onPluginUnload = () => {};
+  </script>
+</body>
+</html>
