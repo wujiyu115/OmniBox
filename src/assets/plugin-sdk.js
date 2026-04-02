@@ -37,11 +37,27 @@
     }
 
     if (data.type === 'theme') {
-      var theme = data.payload;
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
+      var payload = data.payload;
+      // 移除所有配色方案 class
+      var schemeClasses = ['theme-blue', 'theme-green', 'theme-purple', 'theme-orange', 'theme-rose', 'theme-gray', 'theme-dark', 'theme-midnight'];
+      schemeClasses.forEach(function (cls) {
+        document.documentElement.classList.remove(cls);
+      });
+      document.documentElement.classList.remove('dark');
+      // 添加新的配色方案 class
+      if (payload && payload.className) {
+        document.documentElement.classList.add(payload.className);
+        if (payload.isDark) {
+          document.documentElement.classList.add('dark');
+        }
+      } else if (typeof payload === 'string') {
+        // 兼容旧格式
+        if (payload === 'dark') {
+          document.documentElement.classList.add('theme-dark');
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.add('theme-blue');
+        }
       }
     }
   });

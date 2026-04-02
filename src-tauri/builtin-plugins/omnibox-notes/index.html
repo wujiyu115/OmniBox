@@ -6,90 +6,65 @@
   <title>Markdown 笔记</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #1a1a1a; }
-    .dark body { background: #1f2937; color: #f3f4f6; }
-    .dark .sidebar { background: #111827; border-color: #374151; }
-    .dark .search-input { background: #1f2937; border-color: #4b5563; color: #f3f4f6; }
-    .dark .note-item { border-color: #374151; }
-    .dark .note-item:hover { background: #1f2937; }
-    .dark .note-item.active { background: rgba(59,130,246,0.15); }
-    .dark .btn-new { background: #3b82f6; }
-    .dark .btn-new:hover { background: #2563eb; }
-    .dark .toolbar { border-color: #374151; }
-    .dark .title-input { color: #f3f4f6; }
-    .dark .title-input:focus { border-color: #60a5fa; }
-    .dark .mode-btn { background: #374151; color: #d1d5db; }
-    .dark .mode-btn:hover { background: #4b5563; }
-    .dark .mode-btn.active { background: #3b82f6; color: #fff; }
-    .dark .btn-save { background: #22c55e; }
-    .dark .btn-save:hover { background: #16a34a; }
-    .dark .editor { background: #1f2937; color: #f3f4f6; }
-    .dark .preview { color: #f3f4f6; }
-    .dark .btn-delete { color: #9ca3af; }
-    .dark .btn-delete:hover { color: #ef4444; }
-    .dark .error-bar { background: rgba(127,29,29,0.3); border-color: #991b1b; color: #f87171; }
-    .dark .empty-hint { color: #6b7280; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-card, #fff); color: var(--text-primary, #1a1a1a); }
 
     .container { display: flex; height: 100vh; overflow: hidden; }
 
     /* 左侧列表 */
-    .sidebar { width: 224px; display: flex; flex-direction: column; border-right: 1px solid #e5e7eb; background: #f9fafb; flex-shrink: 0; }
-    .sidebar-header { padding: 8px; border-bottom: 1px solid #e5e7eb; display: flex; gap: 4px; }
-    .search-input { flex: 1; padding: 6px 8px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 4px; outline: none; }
-    .search-input:focus { border-color: #3b82f6; }
-    .btn-new { padding: 6px 8px; background: #3b82f6; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
-    .btn-new:hover { background: #2563eb; }
+    .sidebar { width: 224px; display: flex; flex-direction: column; border-right: 1px solid var(--border-color, #e5e7eb); background: var(--bg-primary, #f9fafb); flex-shrink: 0; }
+    .sidebar-header { padding: 8px; border-bottom: 1px solid var(--border-color, #e5e7eb); display: flex; gap: 4px; }
+    .search-input { flex: 1; padding: 6px 8px; font-size: 14px; border: 1px solid var(--border-color, #d1d5db); border-radius: 4px; outline: none; background: var(--bg-input, #fff); color: var(--text-primary, #1a1a1a); }
+    .search-input:focus { border-color: var(--accent, #3b82f6); }
+    .btn-new { padding: 6px 8px; background: var(--accent, #3b82f6); color: var(--accent-text, #fff); border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    .btn-new:hover { background: var(--accent-hover, #2563eb); }
     .note-list { flex: 1; overflow-y: auto; }
-    .note-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
-    .note-item:hover { background: #f3f4f6; }
-    .note-item.active { background: #eff6ff; border-left: 2px solid #3b82f6; }
+    .note-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid var(--border-light, #f3f4f6); font-size: 14px; color: var(--text-primary, #1a1a1a); }
+    .note-item:hover { background: var(--bg-secondary, #f3f4f6); }
+    .note-item.active { background: color-mix(in srgb, var(--accent, #3b82f6) 15%, transparent); border-left: 2px solid var(--accent, #3b82f6); }
     .note-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .btn-delete { display: none; background: none; border: none; cursor: pointer; font-size: 12px; color: #9ca3af; margin-left: 4px; }
+    .btn-delete { display: none; background: none; border: none; cursor: pointer; font-size: 12px; color: var(--text-muted, #9ca3af); margin-left: 4px; }
     .note-item:hover .btn-delete { display: inline; }
-    .btn-delete:hover { color: #ef4444; }
+    .btn-delete:hover { color: var(--error, #ef4444); }
 
     /* 右侧编辑器 */
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid #e5e7eb; }
-    .title-input { flex: 1; font-size: 16px; font-weight: 600; outline: none; border: none; border-bottom: 1px solid transparent; padding: 2px 0; background: transparent; color: #1a1a1a; }
-    .title-input:focus { border-bottom-color: #3b82f6; }
-    .mode-btn { padding: 4px 12px; font-size: 14px; border: none; border-radius: 4px; cursor: pointer; background: #f3f4f6; color: #4b5563; }
-    .mode-btn:hover { background: #e5e7eb; }
-    .mode-btn.active { background: #3b82f6; color: #fff; }
-    .btn-save { padding: 4px 12px; font-size: 14px; border: none; border-radius: 4px; cursor: pointer; background: #22c55e; color: #fff; }
-    .btn-save:hover { background: #16a34a; }
+    .toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid var(--border-color, #e5e7eb); }
+    .title-input { flex: 1; font-size: 16px; font-weight: 600; outline: none; border: none; border-bottom: 1px solid transparent; padding: 2px 0; background: transparent; color: var(--text-primary, #1a1a1a); }
+    .title-input:focus { border-bottom-color: var(--accent, #3b82f6); }
+    .mode-btn { padding: 4px 12px; font-size: 14px; border: none; border-radius: 4px; cursor: pointer; background: var(--bg-secondary, #f3f4f6); color: var(--text-secondary, #4b5563); }
+    .mode-btn:hover { background: var(--bg-card-hover, #e5e7eb); }
+    .mode-btn.active { background: var(--accent, #3b82f6); color: var(--accent-text, #fff); }
+    .btn-save { padding: 4px 12px; font-size: 14px; border: none; border-radius: 4px; cursor: pointer; background: var(--success, #22c55e); color: #fff; }
+    .btn-save:hover { opacity: 0.9; }
     .btn-save:disabled { opacity: 0.5; }
 
-    .editor { width: 100%; height: 100%; padding: 16px; font-family: monospace; font-size: 14px; outline: none; resize: none; border: none; background: #fff; color: #1a1a1a; }
-    .preview { width: 100%; height: 100%; padding: 16px; overflow-y: auto; font-size: 14px; line-height: 1.6; }
+    .editor { width: 100%; height: 100%; padding: 16px; font-family: monospace; font-size: 14px; outline: none; resize: none; border: none; background: var(--bg-card, #fff); color: var(--text-primary, #1a1a1a); }
+    .preview { width: 100%; height: 100%; padding: 16px; overflow-y: auto; font-size: 14px; line-height: 1.6; color: var(--text-primary, #1a1a1a); }
     .preview h1 { font-size: 24px; margin: 16px 0 8px; }
     .preview h2 { font-size: 20px; margin: 14px 0 6px; }
     .preview h3 { font-size: 16px; margin: 12px 0 4px; }
     .preview p { margin: 8px 0; }
-    .preview code { background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 13px; }
-    .preview pre { background: #f3f4f6; padding: 12px; border-radius: 6px; overflow-x: auto; margin: 8px 0; }
+    .preview code { background: var(--bg-secondary, #f3f4f6); padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 13px; }
+    .preview pre { background: var(--bg-secondary, #f3f4f6); padding: 12px; border-radius: 6px; overflow-x: auto; margin: 8px 0; }
     .preview pre code { background: none; padding: 0; }
     .preview ul, .preview ol { padding-left: 24px; margin: 8px 0; }
-    .preview blockquote { border-left: 3px solid #d1d5db; padding-left: 12px; color: #6b7280; margin: 8px 0; }
+    .preview blockquote { border-left: 3px solid var(--border-color, #d1d5db); padding-left: 12px; color: var(--text-secondary, #6b7280); margin: 8px 0; }
 
     .content-area { flex: 1; overflow: hidden; }
-    .empty-hint { color: #9ca3af; font-size: 14px; }
+    .empty-hint { color: var(--text-muted, #9ca3af); font-size: 14px; }
     .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
-    .error-bar { padding: 8px 16px; font-size: 12px; color: #ef4444; border-top: 1px solid #fecaca; background: #fef2f2; }
+    .error-bar { padding: 8px 16px; font-size: 12px; color: var(--error, #ef4444); border-top: 1px solid rgba(239,68,68,0.3); background: rgba(239,68,68,0.1); }
 
     /* 确认删除对话框 */
     .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 100; }
-    .confirm-box { background: #fff; border-radius: 8px; padding: 20px 24px; min-width: 280px; box-shadow: 0 4px 24px rgba(0,0,0,0.15); text-align: center; }
-    .dark .confirm-box { background: #374151; color: #f3f4f6; }
+    .confirm-box { background: var(--bg-card, #fff); border-radius: 8px; padding: 20px 24px; min-width: 280px; box-shadow: 0 4px 24px rgba(0,0,0,0.15); text-align: center; color: var(--text-primary, #1a1a1a); }
     .confirm-title { font-size: 15px; margin-bottom: 16px; }
     .confirm-actions { display: flex; gap: 8px; justify-content: center; }
     .confirm-btn { padding: 6px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
-    .confirm-btn-cancel { background: #e5e7eb; color: #4b5563; }
-    .confirm-btn-cancel:hover { background: #d1d5db; }
-    .dark .confirm-btn-cancel { background: #4b5563; color: #d1d5db; }
-    .dark .confirm-btn-cancel:hover { background: #6b7280; }
-    .confirm-btn-delete { background: #ef4444; color: #fff; }
-    .confirm-btn-delete:hover { background: #dc2626; }
+    .confirm-btn-cancel { background: var(--bg-secondary, #e5e7eb); color: var(--text-secondary, #4b5563); }
+    .confirm-btn-cancel:hover { background: var(--bg-card-hover, #d1d5db); }
+    .confirm-btn-delete { background: var(--error, #ef4444); color: #fff; }
+    .confirm-btn-delete:hover { opacity: 0.9; }
   </style>
 </head>
 <body>

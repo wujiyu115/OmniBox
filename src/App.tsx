@@ -51,11 +51,11 @@ function App() {
   if (currentView === 'plugins' || currentView === 'settings') {
     return (
       <ThemeProvider>
-        <div className="h-screen bg-white dark:bg-gray-900 flex flex-col overflow-hidden">
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
+        <div className="h-screen bg-theme-bg flex flex-col overflow-hidden">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-theme-border bg-theme-card flex-shrink-0">
             <button
               onClick={() => setCurrentView('search')}
-              className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
+              className="flex items-center gap-1.5 text-sm text-theme-text-secondary hover:text-theme-text transition-colors"
             >
               <span>←</span>
               <span>返回</span>
@@ -73,7 +73,7 @@ function App() {
   if (currentView === 'search') {
     return (
       <ThemeProvider>
-        <div className="h-screen bg-white dark:bg-gray-900">
+        <div className="h-screen bg-theme-bg">
           <SearchView onNavigate={setCurrentView} />
         </div>
       </ThemeProvider>
@@ -85,16 +85,16 @@ function App() {
     const pluginId = currentView.replace('plugin:', '');
     return (
       <ThemeProvider>
-        <div className="h-screen bg-white dark:bg-gray-900 flex flex-col overflow-hidden">
-          <div className="flex items-center gap-3 px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
+        <div className="h-screen bg-theme-bg flex flex-col overflow-hidden">
+          <div className="flex items-center gap-3 px-4 py-2 border-b border-theme-border bg-theme-card flex-shrink-0">
             <button
               onClick={() => setCurrentView('search')}
-              className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
+              className="flex items-center gap-1.5 text-sm text-theme-text-secondary hover:text-theme-text transition-colors"
             >
               <span>←</span>
               <span>返回</span>
             </button>
-            <span className="text-xs text-gray-400 dark:text-gray-500">{pluginId}</span>
+            <span className="text-xs text-theme-text-muted">{pluginId}</span>
           </div>
           <div className="flex-1 overflow-hidden">
             <PluginHost pluginId={pluginId} onClose={() => setCurrentView('search')} />
@@ -107,7 +107,7 @@ function App() {
   // 其他页面（如 sync）
   return (
     <ThemeProvider>
-      <div className="h-screen bg-white dark:bg-gray-900 flex flex-col overflow-hidden">
+      <div className="h-screen bg-theme-bg flex flex-col overflow-hidden">
         <main className="flex-1 overflow-hidden">
           {currentView === 'sync' && <SyncSettingsView />}
         </main>

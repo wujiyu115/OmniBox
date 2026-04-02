@@ -8,7 +8,7 @@ export const SearchResults: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-32 text-gray-500 dark:text-gray-400">
+      <div className="flex items-center justify-center h-32 text-theme-text-secondary">
         搜索中...
       </div>
     );
@@ -16,7 +16,7 @@ export const SearchResults: React.FC = () => {
 
   if (results.length === 0) {
     return (
-      <div className="flex items-center justify-center h-32 text-gray-400 dark:text-gray-500">
+      <div className="flex items-center justify-center h-32 text-theme-text-muted">
         输入关键词开始搜索
       </div>
     );

@@ -45,7 +45,7 @@ export const SearchView: React.FC<SearchViewProps> = ({ onNavigate }) => {
   };
 
   return (
-    <div className="flex flex-col bg-white dark:bg-gray-800 overflow-hidden">
+    <div className="flex flex-col bg-theme-card overflow-hidden">
       <SearchInput onIconClick={() => onNavigate('plugins')} />
 
       {hasQuery ? (
@@ -62,10 +62,10 @@ export const SearchView: React.FC<SearchViewProps> = ({ onNavigate }) => {
                 className="flex flex-col items-center w-16 cursor-pointer group"
                 title={plugin.description}
               >
-                <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-2xl group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-theme-bg-secondary flex items-center justify-center text-2xl group-hover:bg-theme-accent/10 transition-colors">
                   {plugin.icon || '🧩'}
                 </div>
-                <span className="mt-1.5 text-xs text-gray-600 dark:text-gray-400 text-center leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <span className="mt-1.5 text-xs text-theme-text-secondary text-center leading-tight line-clamp-2 group-hover:text-theme-accent transition-colors">
                   {plugin.name}
                 </span>
               </div>

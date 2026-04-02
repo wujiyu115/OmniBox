@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 根元素兜底背景色，防止深色模式下露出白色 */
+/* 根元素兜底背景色 */
 html, body, #root {
   height: 100%;
   margin: 0;
@@ -10,16 +10,15 @@ html, body, #root {
 }
 
 html {
-  background-color: #f3f4f6;
+  background-color: var(--bg-primary, #f3f4f6);
 }
 
-html.dark {
-  background-color: #111827;
-}
+/* ========== 8 种配色方案 CSS 变量 ========== */
 
-/* 明暗主题 CSS 变量 */
-:root {
+/* 浅色方案：默认蓝 */
+.theme-blue {
   --bg-primary: #f3f4f6;
+  --bg-secondary: #e5e7eb;
   --bg-card: #ffffff;
   --bg-card-hover: #f9fafb;
   --bg-input: #ffffff;
@@ -28,18 +27,172 @@ html.dark {
   --text-muted: #9ca3af;
   --border-color: #e5e7eb;
   --border-light: #f3f4f6;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-text: #ffffff;
+  --success: #22c55e;
+  --error: #ef4444;
+  --is-dark: 0;
 }
 
-.dark {
-  --bg-primary: #1f2937;
-  --bg-card: #374151;
-  --bg-card-hover: #4b5563;
+/* 浅色方案：翠绿 */
+.theme-green {
+  --bg-primary: #f0fdf4;
+  --bg-secondary: #dcfce7;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0fdf4;
+  --bg-input: #ffffff;
+  --text-primary: #14532d;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --border-color: #bbf7d0;
+  --border-light: #dcfce7;
+  --accent: #22c55e;
+  --accent-hover: #16a34a;
+  --accent-text: #ffffff;
+  --success: #22c55e;
+  --error: #ef4444;
+  --is-dark: 0;
+}
+
+/* 浅色方案：薰衣紫 */
+.theme-purple {
+  --bg-primary: #faf5ff;
+  --bg-secondary: #f3e8ff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #faf5ff;
+  --bg-input: #ffffff;
+  --text-primary: #3b0764;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: #e9d5ff;
+  --border-light: #f3e8ff;
+  --accent: #8b5cf6;
+  --accent-hover: #7c3aed;
+  --accent-text: #ffffff;
+  --success: #22c55e;
+  --error: #ef4444;
+  --is-dark: 0;
+}
+
+/* 浅色方案：活力橙 */
+.theme-orange {
+  --bg-primary: #fff7ed;
+  --bg-secondary: #ffedd5;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fff7ed;
+  --bg-input: #ffffff;
+  --text-primary: #431407;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: #fed7aa;
+  --border-light: #ffedd5;
+  --accent: #f97316;
+  --accent-hover: #ea580c;
+  --accent-text: #ffffff;
+  --success: #22c55e;
+  --error: #ef4444;
+  --is-dark: 0;
+}
+
+/* 浅色方案：玫瑰红 */
+.theme-rose {
+  --bg-primary: #fff1f2;
+  --bg-secondary: #ffe4e6;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fff1f2;
+  --bg-input: #ffffff;
+  --text-primary: #4c0519;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: #fecdd3;
+  --border-light: #ffe4e6;
+  --accent: #ec4899;
+  --accent-hover: #db2777;
+  --accent-text: #ffffff;
+  --success: #22c55e;
+  --error: #ef4444;
+  --is-dark: 0;
+}
+
+/* 浅色方案：极简灰 */
+.theme-gray {
+  --bg-primary: #f9fafb;
+  --bg-secondary: #f3f4f6;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f9fafb;
+  --bg-input: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: #e5e7eb;
+  --border-light: #f3f4f6;
+  --accent: #6b7280;
+  --accent-hover: #4b5563;
+  --accent-text: #ffffff;
+  --success: #22c55e;
+  --error: #ef4444;
+  --is-dark: 0;
+}
+
+/* 深色方案：暗夜黑 */
+.theme-dark {
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-card: #1f2937;
+  --bg-card-hover: #374151;
   --bg-input: #374151;
   --text-primary: #f9fafb;
   --text-secondary: #d1d5db;
   --text-muted: #9ca3af;
-  --border-color: #4b5563;
-  --border-light: #374151;
+  --border-color: #374151;
+  --border-light: #1f2937;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-text: #ffffff;
+  --success: #22c55e;
+  --error: #f87171;
+  --is-dark: 1;
+}
+
+/* 深色方案：午夜蓝 */
+.theme-midnight {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --bg-card-hover: #334155;
+  --bg-input: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border-color: #334155;
+  --border-light: #1e293b;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --accent-text: #ffffff;
+  --success: #22c55e;
+  --error: #f87171;
+  --is-dark: 1;
+}
+
+/* 兜底：未设置配色方案时使用默认蓝 */
+:root {
+  --bg-primary: #f3f4f6;
+  --bg-secondary: #e5e7eb;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f9fafb;
+  --bg-input: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: #e5e7eb;
+  --border-light: #f3f4f6;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-text: #ffffff;
+  --success: #22c55e;
+  --error: #ef4444;
+  --is-dark: 0;
 }
 
 /* 全局主题过渡动画 */

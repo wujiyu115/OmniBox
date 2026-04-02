@@ -154,64 +154,64 @@ export const SyncSettingsView: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    <div className="flex flex-col h-full bg-theme-card rounded-lg shadow-lg overflow-hidden">
       {/* 标题栏 */}
-      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-        <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100">数据同步</h2>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">通过 WebDAV 同步笔记数据</p>
+      <div className="px-4 py-3 border-b border-theme-border-light">
+        <h2 className="text-base font-semibold text-theme-text">数据同步</h2>
+        <p className="text-xs text-theme-text-muted mt-0.5">通过 WebDAV 同步笔记数据</p>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {/* WebDAV 连接配置 */}
         <section>
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-theme-text mb-3 flex items-center gap-2">
             <span>🔗</span>
             <span>WebDAV 连接配置</span>
           </h3>
           <div className="space-y-3">
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">服务器地址</label>
+              <label className="block text-xs text-theme-text-secondary mb-1">服务器地址</label>
               <input
                 type="text"
                 value={webdavConfig.url}
                 onChange={(e) => setWebdavConfig({ ...webdavConfig, url: e.target.value })}
                 placeholder="https://dav.example.com/remote.php/webdav/"
-                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 text-sm border border-theme-border rounded-md bg-theme-input text-theme-text outline-none focus:border-theme-accent"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">用户名</label>
+                <label className="block text-xs text-theme-text-secondary mb-1">用户名</label>
                 <input
                   type="text"
                   value={webdavConfig.username}
                   onChange={(e) => setWebdavConfig({ ...webdavConfig, username: e.target.value })}
                   placeholder="用户名"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none focus:border-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-theme-border rounded-md bg-theme-input text-theme-text outline-none focus:border-theme-accent"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">密码</label>
+                <label className="block text-xs text-theme-text-secondary mb-1">密码</label>
                 <input
                   type="password"
                   value={webdavConfig.password}
                   onChange={(e) => setWebdavConfig({ ...webdavConfig, password: e.target.value })}
                   placeholder="密码"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 outline-none focus:border-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-theme-border rounded-md bg-theme-input text-theme-text outline-none focus:border-theme-accent"
                 />
               </div>
             </div>
 
             {/* 启用开关 */}
-            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700">
+            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-theme-bg">
               <div>
-                <div className="text-sm text-gray-700 dark:text-gray-200">启用同步</div>
-                <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">开启后可手动同步笔记</div>
+                <div className="text-sm text-theme-text">启用同步</div>
+                <div className="text-xs text-theme-text-muted mt-0.5">开启后可手动同步笔记</div>
               </div>
               <button
                 onClick={() => setWebdavConfig({ ...webdavConfig, enabled: !webdavConfig.enabled })}
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
-                  webdavConfig.enabled ? 'bg-blue-500' : 'bg-gray-200 dark:bg-gray-600'
+                  webdavConfig.enabled ? 'bg-theme-accent' : 'bg-theme-border'
                 }`}
               >
                 <span
@@ -227,14 +227,14 @@ export const SyncSettingsView: React.FC = () => {
               <button
                 onClick={saveConfig}
                 disabled={saving}
-                className="px-4 py-2 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 disabled:opacity-50 transition-colors"
+                className="px-4 py-2 bg-theme-accent text-theme-accent-text text-sm rounded-md hover:bg-theme-accent-hover disabled:opacity-50 transition-colors"
               >
                 {saving ? '保存中...' : '保存配置'}
               </button>
               <button
                 onClick={testConnection}
                 disabled={testing || !webdavConfig.url}
-                className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors"
+                className="px-4 py-2 bg-theme-bg text-theme-text text-sm rounded-md hover:bg-theme-card-hover disabled:opacity-50 transition-colors"
               >
                 {testing ? '测试中...' : '测试连接'}
               </button>
@@ -245,8 +245,8 @@ export const SyncSettingsView: React.FC = () => {
               <div
                 className={`px-3 py-2 rounded-md text-sm ${
                   testResult.success
-                    ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800'
-                    : 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800'
+                    ? 'bg-theme-success/10 text-theme-success border border-theme-success/30'
+                    : 'bg-theme-error/10 text-theme-error border border-theme-error/30'
                 }`}
               >
                 {testResult.success ? '✓ ' : '✕ '}
@@ -258,31 +258,31 @@ export const SyncSettingsView: React.FC = () => {
 
         {/* 同步操作 */}
         <section>
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-theme-text mb-3 flex items-center gap-2">
             <span>🔄</span>
             <span>同步操作</span>
           </h3>
           <div className="space-y-3">
             {/* 同步状态 */}
             {syncStatus && (
-              <div className="px-3 py-3 rounded-lg bg-gray-50 dark:bg-gray-700 space-y-2">
+              <div className="px-3 py-3 rounded-lg bg-theme-bg space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">同步状态</span>
-                  <span className={`text-xs font-medium ${syncStatus.enabled ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}>
+                  <span className="text-xs text-theme-text-secondary">同步状态</span>
+                  <span className={`text-xs font-medium ${syncStatus.enabled ? 'text-theme-success' : 'text-theme-text-muted'}`}>
                     {syncStatus.enabled ? '已启用' : '未启用'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">上次同步</span>
-                  <span className="text-xs text-gray-700 dark:text-gray-200">
+                  <span className="text-xs text-theme-text-secondary">上次同步</span>
+                  <span className="text-xs text-theme-text">
                     {syncStatus.last_sync_time
                       ? new Date(syncStatus.last_sync_time).toLocaleString()
                       : '从未同步'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">已同步文件</span>
-                  <span className="text-xs text-gray-700 dark:text-gray-200">{syncStatus.synced_files_count} 个</span>
+                  <span className="text-xs text-theme-text-secondary">已同步文件</span>
+                  <span className="text-xs text-theme-text">{syncStatus.synced_files_count} 个</span>
                 </div>
               </div>
             )}
@@ -291,7 +291,7 @@ export const SyncSettingsView: React.FC = () => {
             <button
               onClick={handleSync}
               disabled={syncing || !webdavConfig.enabled}
-              className="w-full px-4 py-2.5 bg-green-500 text-white text-sm rounded-md hover:bg-green-600 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+              className="w-full px-4 py-2.5 bg-theme-success text-white text-sm rounded-md hover:opacity-90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
             >
               {syncing ? (
                 <>
@@ -311,13 +311,13 @@ export const SyncSettingsView: React.FC = () => {
         {/* 同步结果 */}
         {syncResult && (
           <section>
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-theme-text mb-3 flex items-center gap-2">
               <span>📋</span>
               <span>同步结果</span>
             </h3>
             <div className="space-y-2">
               {syncResult.uploaded.length > 0 && (
-                <div className="px-3 py-2 rounded-md bg-blue-50 dark:bg-blue-900/30 text-sm text-blue-700 dark:text-blue-300">
+                <div className="px-3 py-2 rounded-md bg-theme-accent/10 text-sm text-theme-accent">
                   <div className="font-medium mb-1">已上传 ({syncResult.uploaded.length})</div>
                   {syncResult.uploaded.map((f) => (
                     <div key={f} className="text-xs">↑ {f}</div>
@@ -325,7 +325,7 @@ export const SyncSettingsView: React.FC = () => {
                 </div>
               )}
               {syncResult.downloaded.length > 0 && (
-                <div className="px-3 py-2 rounded-md bg-green-50 dark:bg-green-900/30 text-sm text-green-700 dark:text-green-300">
+                <div className="px-3 py-2 rounded-md bg-theme-success/10 text-sm text-theme-success">
                   <div className="font-medium mb-1">已下载 ({syncResult.downloaded.length})</div>
                   {syncResult.downloaded.map((f) => (
                     <div key={f} className="text-xs">↓ {f}</div>
@@ -333,7 +333,7 @@ export const SyncSettingsView: React.FC = () => {
                 </div>
               )}
               {syncResult.errors.length > 0 && (
-                <div className="px-3 py-2 rounded-md bg-red-50 dark:bg-red-900/30 text-sm text-red-600 dark:text-red-400">
+                <div className="px-3 py-2 rounded-md bg-theme-error/10 text-sm text-theme-error">
                   <div className="font-medium mb-1">错误 ({syncResult.errors.length})</div>
                   {syncResult.errors.map((e, i) => (
                     <div key={i} className="text-xs">✕ {e}</div>
@@ -344,7 +344,7 @@ export const SyncSettingsView: React.FC = () => {
                 syncResult.downloaded.length === 0 &&
                 syncResult.conflicts.length === 0 &&
                 syncResult.errors.length === 0 && (
-                  <div className="px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-700 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="px-3 py-2 rounded-md bg-theme-bg text-sm text-theme-text-secondary">
                     所有文件已是最新状态
                   </div>
                 )}
@@ -355,7 +355,7 @@ export const SyncSettingsView: React.FC = () => {
         {/* 冲突解决 */}
         {syncResult && syncResult.conflicts.length > 0 && (
           <section>
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-theme-text mb-3 flex items-center gap-2">
               <span>⚠️</span>
               <span>冲突文件 ({syncResult.conflicts.length})</span>
             </h3>
@@ -363,15 +363,15 @@ export const SyncSettingsView: React.FC = () => {
               {syncResult.conflicts.map((conflict) => (
                 <div
                   key={conflict.file_name}
-                  className="px-3 py-3 rounded-lg border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20"
+                  className="px-3 py-3 rounded-lg border border-yellow-300 bg-yellow-50/50"
                 >
-                  <div className="text-sm font-medium text-gray-800 dark:text-gray-100 mb-2">
+                  <div className="text-sm font-medium text-theme-text mb-2">
                     {conflict.file_name}
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => resolveConflict(conflict.file_name, 'keep_local')}
-                      className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                      className="px-3 py-1 text-xs bg-theme-accent text-theme-accent-text rounded hover:bg-theme-accent-hover transition-colors"
                     >
                       保留本地
                     </button>
@@ -383,7 +383,7 @@ export const SyncSettingsView: React.FC = () => {
                     </button>
                     <button
                       onClick={() => resolveConflict(conflict.file_name, 'merge')}
-                      className="px-3 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                      className="px-3 py-1 text-xs bg-theme-success text-white rounded hover:opacity-90 transition-colors"
                     >
                       合并
                     </button>
@@ -396,7 +396,7 @@ export const SyncSettingsView: React.FC = () => {
 
         {/* 错误提示 */}
         {error && (
-          <div className="px-3 py-2 rounded-md bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
+          <div className="px-3 py-2 rounded-md bg-theme-error/10 border border-theme-error/30 text-sm text-theme-error">
             {error}
           </div>
         )}
