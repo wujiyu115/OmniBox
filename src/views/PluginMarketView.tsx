@@ -39,9 +39,9 @@ export const PluginMarketView: React.FC<PluginMarketViewProps> = ({ initialTab =
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
 
   return (
-    <div className="flex flex-col h-full bg-theme-card overflow-hidden">
+    <div className="flex flex-col h-full bg-base-100 overflow-hidden">
       {/* Tab 栏 */}
-      <div className="flex border-b border-theme-border flex-shrink-0">
+      <div className="flex border-b border-base-300 flex-shrink-0">
         <TabButton
           label="🧩 插件市场"
           active={activeTab === 'plugins'}
@@ -75,13 +75,13 @@ function TabButton({ label, active, onClick }: TabButtonProps) {
       onClick={onClick}
       className={`px-5 py-2.5 text-sm font-medium transition-colors relative ${
         active
-          ? 'text-theme-accent'
-          : 'text-theme-text-secondary hover:text-theme-text'
+          ? 'text-primary'
+          : 'text-base-content/70 hover:text-base-content'
       }`}
     >
       {label}
       {active && (
-        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-theme-accent" />
+        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
       )}
     </button>
   );
@@ -164,24 +164,24 @@ const PluginListPanel: React.FC = () => {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* 搜索框 */}
-      <div className="px-4 py-2 border-b border-theme-border-light flex-shrink-0">
+      <div className="px-4 py-2 border-b border-base-200 flex-shrink-0">
         <input
           type="text"
           placeholder="搜索插件..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-3 py-1.5 text-sm border border-theme-border rounded-md bg-theme-input text-theme-text placeholder-theme-text-muted focus:outline-none focus:ring-2 focus:ring-theme-accent/50"
+          className="w-full px-3 py-1.5 text-sm border border-base-300 rounded-md bg-base-100 text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-primary/50"
         />
       </div>
 
       {/* 插件列表 */}
       <div className="flex-1 overflow-y-auto p-4">
         {isLoading ? (
-          <div className="flex items-center justify-center h-32 text-theme-text-muted text-sm">
+          <div className="flex items-center justify-center h-32 text-base-content/50 text-sm">
             加载中...
           </div>
         ) : filteredPlugins.length === 0 ? (
-          <div className="flex items-center justify-center h-32 text-theme-text-muted text-sm">
+          <div className="flex items-center justify-center h-32 text-base-content/50 text-sm">
             {searchQuery ? '没有找到匹配的插件' : '暂无插件'}
           </div>
         ) : (
@@ -199,13 +199,13 @@ const PluginListPanel: React.FC = () => {
 
       {/* 错误提示 */}
       {error && (
-        <div className="px-4 py-2 bg-theme-error/10 border-t border-theme-error/30 text-xs text-theme-error">
+        <div className="px-4 py-2 bg-error/10 border-t border-error/30 text-xs text-error">
           {error}
         </div>
       )}
 
       {/* 底部统计 */}
-      <div className="px-4 py-2 border-t border-theme-border-light text-xs text-theme-text-muted flex-shrink-0">
+      <div className="px-4 py-2 border-t border-base-200 text-xs text-base-content/50 flex-shrink-0">
         共 {plugins.length} 个插件，已启用 {plugins.filter((p) => p.enabled).length} 个
       </div>
     </div>
@@ -226,28 +226,28 @@ const PluginCardComponent: React.FC<PluginCardProps> = ({ plugin, onToggle }) =>
         isDependencyMissing
           ? 'border-yellow-300 bg-yellow-50/50'
           : plugin.enabled
-          ? 'border-theme-border bg-theme-card hover:bg-theme-card-hover'
-          : 'border-theme-border-light bg-theme-bg opacity-60'
+          ? 'border-base-300 bg-base-100 hover:bg-base-200'
+          : 'border-base-200 bg-base-200 opacity-60'
       }`}
     >
       {/* 图标 */}
-      <div className="w-10 h-10 rounded-lg bg-theme-accent/10 flex items-center justify-center text-xl flex-shrink-0">
+      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl flex-shrink-0">
         {plugin.icon || '🧩'}
       </div>
 
       {/* 信息 */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-theme-text truncate">{plugin.name}</span>
-          <span className="text-xs text-theme-text-muted flex-shrink-0">v{plugin.version}</span>
+          <span className="text-sm font-medium text-base-content truncate">{plugin.name}</span>
+          <span className="text-xs text-base-content/50 flex-shrink-0">v{plugin.version}</span>
           {plugin.plugin_type === 'system' && (
-            <span className="text-xs bg-theme-bg text-theme-text-secondary px-1.5 py-0.5 rounded flex-shrink-0">系统</span>
+            <span className="text-xs bg-base-200 text-base-content/70 px-1.5 py-0.5 rounded flex-shrink-0">系统</span>
           )}
           {isDependencyMissing && (
             <span className="text-xs text-yellow-600 flex-shrink-0">⚠ 依赖缺失</span>
           )}
         </div>
-        <p className="text-xs text-theme-text-secondary mt-0.5 line-clamp-2">{plugin.description}</p>
+        <p className="text-xs text-base-content/70 mt-0.5 line-clamp-2">{plugin.description}</p>
 
         {/* 依赖缺失提示 */}
         {isDependencyMissing && plugin.missing_deps.length > 0 && (
@@ -258,27 +258,23 @@ const PluginCardComponent: React.FC<PluginCardProps> = ({ plugin, onToggle }) =>
 
         {/* 被依赖信息 */}
         {plugin.dependents.length > 0 && (
-          <div className="mt-1 text-xs text-theme-text-muted">
+          <div className="mt-1 text-xs text-base-content/50">
             被依赖: {plugin.dependents.join(', ')}
           </div>
         )}
 
         <div className="flex items-center gap-1 mt-1">
-          <span className="text-xs text-theme-text-muted/50">ID: {plugin.id}</span>
+          <span className="text-xs text-base-content/30">ID: {plugin.id}</span>
         </div>
       </div>
 
       {/* 启用/禁用开关 */}
-      <button
-        onClick={onToggle}
+      <input
+        type="checkbox"
+        className="toggle toggle-primary toggle-sm"
+        checked={plugin.enabled && !isDependencyMissing}
+        onChange={onToggle}
         disabled={isDependencyMissing}
-        className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
-          isDependencyMissing
-            ? 'bg-yellow-300 cursor-not-allowed'
-            : plugin.enabled
-            ? 'bg-theme-accent'
-            : 'bg-theme-border'
-        }`}
         title={
           isDependencyMissing
             ? '依赖缺失，无法启用'
@@ -286,13 +282,7 @@ const PluginCardComponent: React.FC<PluginCardProps> = ({ plugin, onToggle }) =>
             ? '点击禁用'
             : '点击启用'
         }
-      >
-        <span
-          className={`pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform duration-200 ${
-            plugin.enabled && !isDependencyMissing ? 'translate-x-4' : 'translate-x-0'
-          }`}
-        />
-      </button>
+      />
     </div>
   );
 };

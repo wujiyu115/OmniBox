@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { invoke } from '@tauri-apps/api/core';
-import { COLOR_SCHEMES, DEFAULT_COLOR_SCHEME, getColorScheme } from '../config/colorSchemes';
+import { DAISY_THEMES, DEFAULT_COLOR_SCHEME, getColorScheme } from '../config/colorSchemes';
 
 interface ThemeState {
   colorScheme: string;
@@ -11,21 +11,8 @@ interface ThemeState {
 
 const applyColorScheme = (schemeId: string) => {
   const scheme = getColorScheme(schemeId);
-  const root = document.documentElement;
-
-  // 移除所有配色方案 class
-  COLOR_SCHEMES.forEach((s) => {
-    root.classList.remove(s.className);
-  });
-  root.classList.remove('dark');
-
-  // 添加新的配色方案 class
-  root.classList.add(scheme.className);
-
-  // 深色方案同时添加 dark class
-  if (scheme.isDark) {
-    root.classList.add('dark');
-  }
+  // DaisyUI 通过 data-theme 属性切换主题
+  document.documentElement.setAttribute('data-theme', scheme.id);
 };
 
 export const useThemeStore = create<ThemeState>((set) => ({
@@ -52,11 +39,8 @@ export const useThemeStore = create<ThemeState>((set) => ({
     try {
       const result = await invoke<{ success: boolean; data: { theme: string } }>('get_config');
       if (result.success && result.data) {
-        // 兼容旧配置：dark → theme-dark, light → theme-blue
         let schemeId = result.data.theme;
-        if (schemeId === 'dark') {
-          schemeId = 'dark';
-        } else if (schemeId === 'light' || !COLOR_SCHEMES.find((s) => s.id === schemeId)) {
+        if (!DAISY_THEMES.find((s) => s.id === schemeId)) {
           schemeId = DEFAULT_COLOR_SCHEME;
         }
         const scheme = getColorScheme(schemeId);

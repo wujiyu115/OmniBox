@@ -6,33 +6,33 @@
   <title>翻译</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-card, #fff); color: var(--text-primary, #1a1a1a); }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--color-base-100); color: var(--color-base-content); }
 
     .container { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-    .row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border-color, #e5e7eb); gap: 12px; }
-    .label { font-size: 14px; color: var(--text-secondary, #6b7280); width: 48px; flex-shrink: 0; }
+    .row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--color-base-300); gap: 12px; }
+    .label { font-size: 14px; color: color-mix(in oklab, var(--color-base-content) 70%, transparent); width: 48px; flex-shrink: 0; }
     .lang-buttons { display: flex; gap: 4px; flex-wrap: wrap; }
-    .btn { padding: 4px 12px; border: 1px solid var(--border-color, #d1d5db); border-radius: 4px; cursor: pointer; font-size: 14px; background: var(--bg-secondary, #f3f4f6); color: var(--text-secondary, #4b5563); }
-    .btn:hover { background: var(--bg-card-hover, #e5e7eb); }
-    .btn-active { background: var(--accent, #3b82f6); border-color: var(--accent, #3b82f6); color: var(--accent-text, #fff); }
-    .btn-clear { padding: 8px 12px; border: 1px solid var(--border-color, #d1d5db); border-radius: 6px; cursor: pointer; font-size: 14px; background: var(--bg-card-hover, #f9fafb); color: var(--text-secondary, #6b7280); }
-    .btn-clear:hover { background: var(--bg-secondary, #f3f4f6); }
+    .btn { padding: 4px 12px; border: 1px solid var(--color-base-300); border-radius: 4px; cursor: pointer; font-size: 14px; background: var(--color-base-300); color: color-mix(in oklab, var(--color-base-content) 70%, transparent); }
+    .btn:hover { background: var(--color-base-200); }
+    .btn-active { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-primary-content); }
+    .btn-clear { padding: 8px 12px; border: 1px solid var(--color-base-300); border-radius: 6px; cursor: pointer; font-size: 14px; background: var(--color-base-200); color: color-mix(in oklab, var(--color-base-content) 70%, transparent); }
+    .btn-clear:hover { background: var(--color-base-300); }
 
-    .input-area { padding: 12px 16px; border-bottom: 1px solid var(--border-color, #e5e7eb); }
+    .input-area { padding: 12px 16px; border-bottom: 1px solid var(--color-base-300); }
     .input-row { display: flex; align-items: flex-start; gap: 8px; }
-    .textarea-box { flex: 1; padding: 8px 12px; border: 1px solid var(--border-color, #d1d5db); border-radius: 6px; outline: none; font-size: 14px; resize: none; min-height: 100px; background: var(--bg-input, #fff); color: var(--text-primary, #1a1a1a); }
-    .textarea-box:focus { border-color: var(--accent, #3b82f6); }
+    .textarea-box { flex: 1; padding: 8px 12px; border: 1px solid var(--color-base-300); border-radius: 6px; outline: none; font-size: 14px; resize: none; min-height: 100px; background: var(--color-base-100); color: var(--color-base-content); }
+    .textarea-box:focus { border-color: var(--color-primary); }
 
     .result-section { flex: 1; padding: 12px 16px; display: flex; flex-direction: column; }
     .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .result-label { font-size: 14px; color: var(--text-secondary, #6b7280); }
-    .loading-text { font-size: 12px; color: var(--accent, #3b82f6); }
-    .result-box { padding: 12px; background: var(--bg-card-hover, #f9fafb); border-radius: 6px; border: 1px solid var(--border-color, #e5e7eb); font-size: 14px; line-height: 1.6; min-height: 80px; white-space: pre-wrap; position: relative; color: var(--text-primary, #1a1a1a); }
-    .btn-copy { position: absolute; top: 8px; right: 8px; padding: 4px 8px; background: var(--accent, #3b82f6); border: 1px solid var(--accent, #3b82f6); color: var(--accent-text, #fff); border-radius: 4px; cursor: pointer; font-size: 12px; }
-    .btn-copy:hover { background: var(--accent-hover, #2563eb); }
-    .error-box { padding: 12px; background: rgba(239,68,68,0.1); border-radius: 6px; border: 1px solid rgba(239,68,68,0.3); font-size: 14px; color: var(--error, #ef4444); }
-    .hint-text { color: var(--text-muted, #9ca3af); font-size: 14px; }
-    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 96px; gap: 8px; color: var(--text-muted, #9ca3af); }
+    .result-label { font-size: 14px; color: color-mix(in oklab, var(--color-base-content) 70%, transparent); }
+    .loading-text { font-size: 12px; color: var(--color-primary); }
+    .result-box { padding: 12px; background: var(--color-base-200); border-radius: 6px; border: 1px solid var(--color-base-300); font-size: 14px; line-height: 1.6; min-height: 80px; white-space: pre-wrap; position: relative; color: var(--color-base-content); }
+    .btn-copy { position: absolute; top: 8px; right: 8px; padding: 4px 8px; background: var(--color-primary); border: 1px solid var(--color-primary); color: var(--color-primary-content); border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .btn-copy:hover { background: oklch(from var(--color-primary) calc(l - 0.05) c h); }
+    .error-box { padding: 12px; background: color-mix(in oklab, var(--color-error) 10%, transparent); border-radius: 6px; border: 1px solid color-mix(in oklab, var(--color-error) 30%, transparent); font-size: 14px; color: var(--color-error); }
+    .hint-text { color: color-mix(in oklab, var(--color-base-content) 50%, transparent); font-size: 14px; }
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 96px; gap: 8px; color: color-mix(in oklab, var(--color-base-content) 50%, transparent); }
     .empty-icon { font-size: 24px; }
   </style>
 </head>

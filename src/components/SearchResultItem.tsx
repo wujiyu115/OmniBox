@@ -16,16 +16,16 @@ export const SearchResultItem: React.FC<SearchResultItemProps> = ({
     <div
       onClick={onClick}
       className={`flex items-center px-4 py-3 cursor-pointer transition-colors ${
-        selected ? 'bg-theme-accent/10 border-l-4 border-theme-accent' : 'hover:bg-theme-card-hover border-l-4 border-transparent'
+        selected ? 'bg-primary/10 border-l-4 border-primary' : 'hover:bg-base-200 border-l-4 border-transparent'
       }`}
     >
       <span className="text-2xl mr-4">{result.icon || '🔧'}</span>
       <div className="flex-1">
-        <div className="font-medium text-theme-text">{result.title}</div>
-        <div className="text-sm text-theme-text-secondary">{result.subtitle}</div>
+        <div className="font-medium text-base-content">{result.title}</div>
+        <div className="text-sm text-base-content/70">{result.subtitle}</div>
       </div>
       {selected && (
-        <span className="text-theme-accent text-sm">↵ Enter</span>
+        <span className="text-primary text-sm">↵ Enter</span>
       )}
     </div>
   );

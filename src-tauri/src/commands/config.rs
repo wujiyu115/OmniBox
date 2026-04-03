@@ -86,8 +86,16 @@ fn save_config_to_file(config: &AppConfig) -> Result<(), String> {
 
 /// 验证配置合法性
 fn validate_config(config: &AppConfig) -> Result<(), String> {
-    // 验证主题值（支持 8 种配色方案 + 旧值 light 兼容）
-    let valid_themes = ["blue", "green", "purple", "orange", "rose", "gray", "dark", "midnight", "light"];
+    // 验证主题值（DaisyUI 35 个内置主题）
+    let valid_themes = [
+        // 浅色主题
+        "light", "cupcake", "bumblebee", "emerald", "corporate", "retro",
+        "cyberpunk", "valentine", "garden", "lofi", "pastel", "fantasy",
+        "wireframe", "cmyk", "autumn", "acid", "lemonade", "winter", "nord",
+        // 深色主题
+        "dark", "synthwave", "halloween", "forest", "aqua", "black",
+        "luxury", "dracula", "business", "night", "coffee", "dim", "sunset",
+    ];
     if !valid_themes.contains(&config.theme.as_str()) {
         return Err(format!("无效的主题值: {}，仅支持 {:?}", config.theme, valid_themes));
     }

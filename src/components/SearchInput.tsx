@@ -25,7 +25,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({ onIconClick }) => {
   };
 
   return (
-    <div className="relative flex items-center w-full px-4 py-3 bg-theme-card border-b border-theme-border">
+    <div className="relative flex items-center w-full px-4 py-3 bg-base-100 border-b border-base-300">
       <button
         onClick={onIconClick}
         className="text-xl mr-3 hover:scale-110 transition-transform cursor-pointer"
@@ -40,13 +40,13 @@ export const SearchInput: React.FC<SearchInputProps> = ({ onIconClick }) => {
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder="输入插件名、命令或文件..."
-        className="flex-1 text-lg outline-none bg-transparent text-theme-text placeholder-theme-text-muted"
+        className="flex-1 text-lg outline-none bg-transparent text-base-content placeholder:text-base-content/40"
         autoFocus
       />
       {query && (
         <button
           onClick={clearSearch}
-          className="ml-2 px-3 py-1 text-theme-text-secondary hover:text-theme-text hover:bg-theme-card-hover rounded"
+          className="ml-2 px-3 py-1 text-base-content/70 hover:text-base-content hover:bg-base-200 rounded"
         >
           ✕
         </button>

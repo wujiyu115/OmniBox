@@ -5,7 +5,7 @@ import { useSearchStore, usePluginStore } from '../stores';
 
 
 interface SearchViewProps {
-  onNavigate: (view: string) => void;
+  onNavigate: (view: 'search' | 'plugins' | 'settings' | 'sync' | `plugin:${string}`) => void;
 }
 
 export const SearchView: React.FC<SearchViewProps> = ({ onNavigate }) => {
@@ -45,7 +45,7 @@ export const SearchView: React.FC<SearchViewProps> = ({ onNavigate }) => {
   };
 
   return (
-    <div className="flex flex-col bg-theme-card overflow-hidden">
+    <div className="flex flex-col bg-base-100 overflow-hidden">
       <SearchInput onIconClick={() => onNavigate('plugins')} />
 
       {hasQuery ? (
@@ -62,10 +62,10 @@ export const SearchView: React.FC<SearchViewProps> = ({ onNavigate }) => {
                 className="flex flex-col items-center w-16 cursor-pointer group"
                 title={plugin.description}
               >
-                <div className="w-12 h-12 rounded-xl bg-theme-bg-secondary flex items-center justify-center text-2xl group-hover:bg-theme-accent/10 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-base-300 flex items-center justify-center text-2xl group-hover:bg-primary/10 transition-colors">
                   {plugin.icon || '🧩'}
                 </div>
-                <span className="mt-1.5 text-xs text-theme-text-secondary text-center leading-tight line-clamp-2 group-hover:text-theme-accent transition-colors">
+                <span className="mt-1.5 text-xs text-base-content/70 text-center leading-tight line-clamp-2 group-hover:text-primary transition-colors">
                   {plugin.name}
                 </span>
               </div>

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import pluginSdkSource from '../assets/plugin-sdk.js?raw';
-import pluginThemeCss from '../assets/plugin-theme.css?raw';
-import { COLOR_SCHEMES, getColorScheme } from '../config/colorSchemes';
+import pluginDaisyCss from '../assets/plugin-daisy.css?raw';
+import { getColorScheme } from '../config/colorSchemes';
 
 // 全局插件 HTML 缓存（原始 HTML，未注入 SDK）
 const pluginHtmlCache = new Map<string, string>();
@@ -10,39 +10,22 @@ const pluginHtmlCache = new Map<string, string>();
 /** 内置 SDK 脚本：从独立文件导入，自动注入到每个插件 HTML 的 <head> 中 */
 const PLUGIN_SDK_SCRIPT = `<script>${pluginSdkSource}</script>`;
 
-/** 插件配色方案 CSS：注入到每个插件 HTML 的 <head> 中 */
-const PLUGIN_THEME_STYLE = `<style>${pluginThemeCss}</style>`;
+/** DaisyUI CSS：注入到每个插件 HTML 的 <head> 中 */
+const PLUGIN_DAISY_STYLE = `<style>${pluginDaisyCss}</style>`;
 
-/** 获取当前配色方案的 class 名 */
-function getCurrentColorSchemeClass(): string {
-  for (const scheme of COLOR_SCHEMES) {
-    if (document.documentElement.classList.contains(scheme.className)) {
-      return scheme.className;
-    }
-  }
-  return 'theme-blue';
+/** 获取当前 DaisyUI 主题 ID */
+function getCurrentThemeId(): string {
+  return document.documentElement.getAttribute('data-theme') || 'light';
 }
 
-/** 获取当前配色方案 ID */
-function getCurrentColorSchemeId(): string {
-  for (const scheme of COLOR_SCHEMES) {
-    if (document.documentElement.classList.contains(scheme.className)) {
-      return scheme.id;
-    }
-  }
-  return 'blue';
-}
-
-/** 将 SDK 脚本、配色方案 CSS 和主题注入到插件 HTML 中 */
+/** 将 SDK 脚本、DaisyUI CSS 和主题注入到插件 HTML 中 */
 function injectSdkAndTheme(rawHtml: string): string {
-  const schemeClass = getCurrentColorSchemeClass();
-  const scheme = getColorScheme(getCurrentColorSchemeId());
-  // 在 <html> 标签上添加配色方案 class（深色方案同时添加 dark class）
+  const themeId = getCurrentThemeId();
   let html = rawHtml;
-  const extraClasses = scheme.isDark ? `${schemeClass} dark` : schemeClass;
-  html = html.replace(/<html([^>]*)>/i, `<html$1 class="${extraClasses}">`);
-  // 将 SDK 脚本和配色方案 CSS 注入到 <head> 的最前面
-  const injection = PLUGIN_THEME_STYLE + PLUGIN_SDK_SCRIPT;
+  // 在 <html> 标签上添加 data-theme 属性
+  html = html.replace(/<html([^>]*)>/i, `<html$1 data-theme="${themeId}">`);
+  // 将 DaisyUI CSS 和 SDK 脚本注入到 <head> 的最前面
+  const injection = PLUGIN_DAISY_STYLE + PLUGIN_SDK_SCRIPT;
   if (html.includes('<head>')) {
     html = html.replace('<head>', '<head>' + injection);
   } else if (html.includes('<head ')) {
@@ -148,9 +131,9 @@ export const PluginHost: React.FC<PluginHostProps> = ({ pluginId, onClose }) => 
         onClose();
         return null;
       case 'getTheme': {
-        const schemeId = getCurrentColorSchemeId();
-        const currentScheme = getColorScheme(schemeId);
-        return { theme: schemeId, isDark: currentScheme.isDark, className: currentScheme.className };
+        const themeId = getCurrentThemeId();
+        const currentScheme = getColorScheme(themeId);
+        return { theme: themeId, isDark: currentScheme.isDark, themeId: themeId };
       }
       case 'notify':
         console.log('[Plugin Notify]', data.payload?.message);
@@ -176,20 +159,20 @@ export const PluginHost: React.FC<PluginHostProps> = ({ pluginId, onClose }) => 
     };
   }, [handleMessage]);
 
-  // 监听主窗口配色方案变化，同步到插件 iframe
+  // 监听主窗口 data-theme 变化，同步到插件 iframe
   useEffect(() => {
     const observer = new MutationObserver(() => {
-      const schemeId = getCurrentColorSchemeId();
-      const currentScheme = getColorScheme(schemeId);
+      const themeId = getCurrentThemeId();
+      const currentScheme = getColorScheme(themeId);
       iframeRef.current?.contentWindow?.postMessage(
-        { source: 'omnibox-host', type: 'theme', payload: { schemeId, className: currentScheme.className, isDark: currentScheme.isDark } },
+        { source: 'omnibox-host', type: 'theme', payload: { themeId, isDark: currentScheme.isDark } },
         '*'
       );
     });
 
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class'],
+      attributeFilter: ['data-theme'],
     });
 
     return () => observer.disconnect();
@@ -197,13 +180,13 @@ export const PluginHost: React.FC<PluginHostProps> = ({ pluginId, onClose }) => 
 
   if (loadError) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-theme-text-secondary gap-3">
+      <div className="flex flex-col items-center justify-center h-full text-base-content/70 gap-3">
         <span className="text-3xl">⚠️</span>
         <span className="text-sm">插件加载失败</span>
-        <span className="text-xs text-theme-error max-w-md text-center">{loadError}</span>
+        <span className="text-xs text-error max-w-md text-center">{loadError}</span>
         <button
           onClick={onClose}
-          className="mt-2 px-4 py-1.5 text-sm bg-theme-bg-secondary rounded hover:bg-theme-card-hover transition-colors"
+          className="btn btn-ghost btn-sm mt-2"
         >
           返回
         </button>
@@ -213,7 +196,7 @@ export const PluginHost: React.FC<PluginHostProps> = ({ pluginId, onClose }) => 
 
   if (!preparedHtml) {
     return (
-      <div className="flex items-center justify-center h-full text-theme-text-muted text-sm">
+      <div className="flex items-center justify-center h-full text-base-content/50 text-sm">
         加载插件中...
       </div>
     );

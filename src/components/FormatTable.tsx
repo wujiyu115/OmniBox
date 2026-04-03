@@ -8,8 +8,8 @@ interface FormatTableProps {
 
 export const FormatTable: React.FC<FormatTableProps> = ({ formats, onLoad }) => {
   return (
-    <div className="border-t border-theme-border">
-      <div className="grid grid-cols-3 bg-theme-bg text-sm font-medium text-theme-text-secondary">
+    <div className="border-t border-base-300">
+      <div className="grid grid-cols-3 bg-base-200 text-sm font-medium text-base-content/70">
         <div className="px-4 py-2">格式</div>
         <div className="px-4 py-2">值</div>
         <div className="px-4 py-2 text-right">操作</div>
@@ -17,14 +17,14 @@ export const FormatTable: React.FC<FormatTableProps> = ({ formats, onLoad }) => 
       {formats.map((entry, index) => (
         <div
           key={index}
-          className="grid grid-cols-3 border-t border-theme-border-light hover:bg-theme-card-hover text-sm"
+          className="grid grid-cols-3 border-t border-base-200 hover:bg-base-200 text-sm"
         >
-          <div className="px-4 py-3 text-theme-text-secondary">{entry.format}</div>
-          <div className="px-4 py-3 font-mono text-theme-text">{entry.value}</div>
+          <div className="px-4 py-3 text-base-content/70">{entry.format}</div>
+          <div className="px-4 py-3 font-mono text-base-content">{entry.value}</div>
           <div className="px-4 py-2 text-right">
             <button
               onClick={() => onLoad(entry.value)}
-              className="px-3 py-1 border border-theme-border rounded text-theme-text-secondary hover:bg-theme-bg transition-colors"
+              className="btn btn-outline btn-xs"
             >
               加载
             </button>

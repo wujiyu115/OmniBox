@@ -1,6 +1,6 @@
 import React from 'react';
 import { useThemeStore } from '../stores';
-import { COLOR_SCHEMES } from '../config/colorSchemes';
+import { LIGHT_THEMES, DARK_THEMES } from '../config/colorSchemes';
 
 interface ShortcutItem {
   label: string;
@@ -20,30 +20,34 @@ export const SettingsView: React.FC = () => {
   const { colorScheme, setColorScheme } = useThemeStore();
 
   return (
-    <div className="flex flex-col h-full bg-theme-card rounded-lg shadow-lg overflow-hidden">
+    <div className="flex flex-col h-full bg-base-100 rounded-lg shadow-lg overflow-hidden">
       {/* 标题栏 */}
-      <div className="px-4 py-3 border-b border-theme-border-light">
-        <h2 className="text-base font-semibold text-theme-text">系统设置</h2>
-        <p className="text-xs text-theme-text-muted mt-0.5">OmniBox 配置与快捷键</p>
+      <div className="px-4 py-3 border-b border-base-200">
+        <h2 className="text-base font-semibold text-base-content">系统设置</h2>
+        <p className="text-xs text-base-content/50 mt-0.5">OmniBox 配置与快捷键</p>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {/* 配色方案选择器 */}
         <section>
-          <h3 className="text-sm font-semibold text-theme-text mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-base-content mb-3 flex items-center gap-2">
             <span>🎨</span>
             <span>配色方案</span>
           </h3>
-          <div className="grid grid-cols-4 gap-2">
-            {COLOR_SCHEMES.map((scheme) => (
+
+          {/* 浅色主题 */}
+          <div className="mb-2 text-xs text-base-content/50 font-medium">浅色主题</div>
+          <div className="grid grid-cols-4 gap-2 mb-4">
+            {LIGHT_THEMES.map((scheme) => (
               <button
                 key={scheme.id}
                 onClick={() => setColorScheme(scheme.id)}
                 className={`flex flex-col items-center gap-1.5 p-2.5 rounded-lg border-2 transition-all cursor-pointer ${
                   colorScheme === scheme.id
-                    ? 'border-theme-accent bg-theme-accent/10'
-                    : 'border-theme-border hover:border-theme-text-muted bg-theme-card-hover'
+                    ? 'border-primary'
+                    : 'border-base-300 hover:border-base-content/30'
                 }`}
+                style={{ backgroundColor: scheme.previewBgColor }}
                 title={scheme.name}
               >
                 <div
@@ -54,7 +58,41 @@ export const SettingsView: React.FC = () => {
                     <span className="text-white text-xs font-bold">✓</span>
                   )}
                 </div>
-                <span className={`text-xs ${colorScheme === scheme.id ? 'text-theme-accent font-medium' : 'text-theme-text-secondary'}`}>
+                <span className={`text-xs font-medium ${colorScheme === scheme.id ? 'text-primary' : 'text-base-content/70'}`}
+                  style={{ color: colorScheme === scheme.id ? undefined : '#333' }}
+                >
+                  {scheme.name}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* 深色主题 */}
+          <div className="mb-2 text-xs text-base-content/50 font-medium">深色主题</div>
+          <div className="grid grid-cols-4 gap-2">
+            {DARK_THEMES.map((scheme) => (
+              <button
+                key={scheme.id}
+                onClick={() => setColorScheme(scheme.id)}
+                className={`flex flex-col items-center gap-1.5 p-2.5 rounded-lg border-2 transition-all cursor-pointer ${
+                  colorScheme === scheme.id
+                    ? 'border-primary'
+                    : 'border-base-300 hover:border-base-content/30'
+                }`}
+                style={{ backgroundColor: scheme.previewBgColor }}
+                title={scheme.name}
+              >
+                <div
+                  className="w-8 h-8 rounded-full border-2 border-white shadow-sm flex items-center justify-center"
+                  style={{ backgroundColor: scheme.previewColor }}
+                >
+                  {colorScheme === scheme.id && (
+                    <span className="text-white text-xs font-bold">✓</span>
+                  )}
+                </div>
+                <span className={`text-xs font-medium ${colorScheme === scheme.id ? 'text-primary' : ''}`}
+                  style={{ color: colorScheme === scheme.id ? undefined : (scheme.isDark ? '#ccc' : '#333') }}
+                >
                   {scheme.name}
                 </span>
               </button>
@@ -64,24 +102,24 @@ export const SettingsView: React.FC = () => {
 
         {/* WebDAV 同步入口 */}
         <section>
-          <h3 className="text-sm font-semibold text-theme-text mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-base-content mb-3 flex items-center gap-2">
             <span>🔄</span>
             <span>数据同步</span>
           </h3>
-          <div className="px-3 py-3 rounded-lg bg-theme-bg space-y-2">
+          <div className="px-3 py-3 rounded-lg bg-base-200 space-y-2">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-theme-text">WebDAV 同步</div>
-                <div className="text-xs text-theme-text-muted mt-0.5">通过 WebDAV 同步笔记数据</div>
+                <div className="text-sm text-base-content">WebDAV 同步</div>
+                <div className="text-xs text-base-content/50 mt-0.5">通过 WebDAV 同步笔记数据</div>
               </div>
-              <span className="text-xs text-theme-text-muted">前往"同步"页面配置 →</span>
+              <span className="text-xs text-base-content/50">前往"同步"页面配置 →</span>
             </div>
           </div>
         </section>
 
         {/* 快捷键配置 */}
         <section>
-          <h3 className="text-sm font-semibold text-theme-text mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-base-content mb-3 flex items-center gap-2">
             <span>⌨️</span>
             <span>快捷键</span>
           </h3>
@@ -89,20 +127,20 @@ export const SettingsView: React.FC = () => {
             {SHORTCUTS.map((item, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-theme-bg hover:bg-theme-card-hover transition-colors"
+                className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-base-200 hover:bg-base-300 transition-colors"
               >
                 <div>
-                  <div className="text-sm text-theme-text">{item.label}</div>
-                  <div className="text-xs text-theme-text-muted mt-0.5">{item.description}</div>
+                  <div className="text-sm text-base-content">{item.label}</div>
+                  <div className="text-xs text-base-content/50 mt-0.5">{item.description}</div>
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
                   {item.keys.map((key, i) => (
                     <React.Fragment key={i}>
-                      <kbd className="px-2 py-1 text-xs font-mono bg-theme-card border border-theme-border rounded shadow-sm text-theme-text-secondary">
+                      <kbd className="kbd kbd-sm text-xs font-mono">
                         {key}
                       </kbd>
                       {i < item.keys.length - 1 && (
-                        <span className="text-theme-text-muted text-xs">+</span>
+                        <span className="text-base-content/50 text-xs">+</span>
                       )}
                     </React.Fragment>
                   ))}
@@ -114,25 +152,25 @@ export const SettingsView: React.FC = () => {
 
         {/* 关于信息 */}
         <section>
-          <h3 className="text-sm font-semibold text-theme-text mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-base-content mb-3 flex items-center gap-2">
             <span>ℹ️</span>
             <span>关于</span>
           </h3>
-          <div className="px-3 py-3 rounded-lg bg-theme-bg space-y-2">
+          <div className="px-3 py-3 rounded-lg bg-base-200 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-theme-text-secondary">应用名称</span>
-              <span className="text-xs text-theme-text font-medium">OmniBox</span>
+              <span className="text-xs text-base-content/70">应用名称</span>
+              <span className="text-xs text-base-content font-medium">OmniBox</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-theme-text-secondary">版本</span>
-              <span className="text-xs text-theme-text font-mono">0.1.0</span>
+              <span className="text-xs text-base-content/70">版本</span>
+              <span className="text-xs text-base-content font-mono">0.1.0</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-theme-text-secondary">构建框架</span>
-              <span className="text-xs text-theme-text">Tauri 2.0 + React</span>
+              <span className="text-xs text-base-content/70">构建框架</span>
+              <span className="text-xs text-base-content">Tauri 2.0 + React</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-theme-text-secondary">项目地址</span>
+              <span className="text-xs text-base-content/70">项目地址</span>
               <a
                 href="#"
                 onClick={(e) => {
@@ -141,7 +179,7 @@ export const SettingsView: React.FC = () => {
                     invoke('open_url', { url: 'https://github.com/omnibox/omnibox' });
                   });
                 }}
-                className="text-xs text-theme-accent hover:underline"
+                className="text-xs text-primary hover:underline"
               >
                 GitHub
               </a>
@@ -151,11 +189,11 @@ export const SettingsView: React.FC = () => {
 
         {/* 托盘设置说明 */}
         <section>
-          <h3 className="text-sm font-semibold text-theme-text mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-base-content mb-3 flex items-center gap-2">
             <span>🖥️</span>
             <span>系统托盘</span>
           </h3>
-          <div className="px-3 py-3 rounded-lg bg-theme-accent/10 text-xs text-theme-accent space-y-1">
+          <div className="px-3 py-3 rounded-lg bg-primary/10 text-xs text-primary space-y-1">
             <p>OmniBox 运行时会在系统托盘显示图标。</p>
             <p>右键托盘图标可访问快捷菜单，左键单击可切换窗口显示/隐藏。</p>
             <p>关闭主窗口不会退出应用，请通过托盘菜单的"退出"选项完全退出。</p>

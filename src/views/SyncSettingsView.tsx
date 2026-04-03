@@ -154,72 +154,66 @@ export const SyncSettingsView: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-theme-card rounded-lg shadow-lg overflow-hidden">
+    <div className="flex flex-col h-full bg-base-100 rounded-lg shadow-lg overflow-hidden">
       {/* 标题栏 */}
-      <div className="px-4 py-3 border-b border-theme-border-light">
-        <h2 className="text-base font-semibold text-theme-text">数据同步</h2>
-        <p className="text-xs text-theme-text-muted mt-0.5">通过 WebDAV 同步笔记数据</p>
+      <div className="px-4 py-3 border-b border-base-200">
+        <h2 className="text-base font-semibold text-base-content">数据同步</h2>
+        <p className="text-xs text-base-content/50 mt-0.5">通过 WebDAV 同步笔记数据</p>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {/* WebDAV 连接配置 */}
         <section>
-          <h3 className="text-sm font-semibold text-theme-text mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-base-content mb-3 flex items-center gap-2">
             <span>🔗</span>
             <span>WebDAV 连接配置</span>
           </h3>
           <div className="space-y-3">
             <div>
-              <label className="block text-xs text-theme-text-secondary mb-1">服务器地址</label>
+              <label className="block text-xs text-base-content/70 mb-1">服务器地址</label>
               <input
                 type="text"
                 value={webdavConfig.url}
                 onChange={(e) => setWebdavConfig({ ...webdavConfig, url: e.target.value })}
                 placeholder="https://dav.example.com/remote.php/webdav/"
-                className="w-full px-3 py-2 text-sm border border-theme-border rounded-md bg-theme-input text-theme-text outline-none focus:border-theme-accent"
+                className="input input-bordered input-sm w-full"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-theme-text-secondary mb-1">用户名</label>
+                <label className="block text-xs text-base-content/70 mb-1">用户名</label>
                 <input
                   type="text"
                   value={webdavConfig.username}
                   onChange={(e) => setWebdavConfig({ ...webdavConfig, username: e.target.value })}
                   placeholder="用户名"
-                  className="w-full px-3 py-2 text-sm border border-theme-border rounded-md bg-theme-input text-theme-text outline-none focus:border-theme-accent"
+                  className="input input-bordered input-sm w-full"
                 />
               </div>
               <div>
-                <label className="block text-xs text-theme-text-secondary mb-1">密码</label>
+                <label className="block text-xs text-base-content/70 mb-1">密码</label>
                 <input
                   type="password"
                   value={webdavConfig.password}
                   onChange={(e) => setWebdavConfig({ ...webdavConfig, password: e.target.value })}
                   placeholder="密码"
-                  className="w-full px-3 py-2 text-sm border border-theme-border rounded-md bg-theme-input text-theme-text outline-none focus:border-theme-accent"
+                  className="input input-bordered input-sm w-full"
                 />
               </div>
             </div>
 
             {/* 启用开关 */}
-            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-theme-bg">
+            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-base-200">
               <div>
-                <div className="text-sm text-theme-text">启用同步</div>
-                <div className="text-xs text-theme-text-muted mt-0.5">开启后可手动同步笔记</div>
+                <div className="text-sm text-base-content">启用同步</div>
+                <div className="text-xs text-base-content/50 mt-0.5">开启后可手动同步笔记</div>
               </div>
-              <button
-                onClick={() => setWebdavConfig({ ...webdavConfig, enabled: !webdavConfig.enabled })}
-                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
-                  webdavConfig.enabled ? 'bg-theme-accent' : 'bg-theme-border'
-                }`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform transition-transform duration-200 ${
-                    webdavConfig.enabled ? 'translate-x-5' : 'translate-x-0'
-                  }`}
-                />
-              </button>
+              <input
+                type="checkbox"
+                className="toggle toggle-primary toggle-sm"
+                checked={webdavConfig.enabled}
+                onChange={() => setWebdavConfig({ ...webdavConfig, enabled: !webdavConfig.enabled })}
+              />
             </div>
 
             {/* 操作按钮 */}
@@ -227,14 +221,14 @@ export const SyncSettingsView: React.FC = () => {
               <button
                 onClick={saveConfig}
                 disabled={saving}
-                className="px-4 py-2 bg-theme-accent text-theme-accent-text text-sm rounded-md hover:bg-theme-accent-hover disabled:opacity-50 transition-colors"
+                className="btn btn-primary btn-sm"
               >
                 {saving ? '保存中...' : '保存配置'}
               </button>
               <button
                 onClick={testConnection}
                 disabled={testing || !webdavConfig.url}
-                className="px-4 py-2 bg-theme-bg text-theme-text text-sm rounded-md hover:bg-theme-card-hover disabled:opacity-50 transition-colors"
+                className="btn btn-ghost btn-sm"
               >
                 {testing ? '测试中...' : '测试连接'}
               </button>
@@ -245,8 +239,8 @@ export const SyncSettingsView: React.FC = () => {
               <div
                 className={`px-3 py-2 rounded-md text-sm ${
                   testResult.success
-                    ? 'bg-theme-success/10 text-theme-success border border-theme-success/30'
-                    : 'bg-theme-error/10 text-theme-error border border-theme-error/30'
+                    ? 'bg-success/10 text-success border border-success/30'
+                    : 'bg-error/10 text-error border border-error/30'
                 }`}
               >
                 {testResult.success ? '✓ ' : '✕ '}
@@ -258,31 +252,31 @@ export const SyncSettingsView: React.FC = () => {
 
         {/* 同步操作 */}
         <section>
-          <h3 className="text-sm font-semibold text-theme-text mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-base-content mb-3 flex items-center gap-2">
             <span>🔄</span>
             <span>同步操作</span>
           </h3>
           <div className="space-y-3">
             {/* 同步状态 */}
             {syncStatus && (
-              <div className="px-3 py-3 rounded-lg bg-theme-bg space-y-2">
+              <div className="px-3 py-3 rounded-lg bg-base-200 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-theme-text-secondary">同步状态</span>
-                  <span className={`text-xs font-medium ${syncStatus.enabled ? 'text-theme-success' : 'text-theme-text-muted'}`}>
+                  <span className="text-xs text-base-content/70">同步状态</span>
+                  <span className={`text-xs font-medium ${syncStatus.enabled ? 'text-success' : 'text-base-content/50'}`}>
                     {syncStatus.enabled ? '已启用' : '未启用'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-theme-text-secondary">上次同步</span>
-                  <span className="text-xs text-theme-text">
+                  <span className="text-xs text-base-content/70">上次同步</span>
+                  <span className="text-xs text-base-content">
                     {syncStatus.last_sync_time
                       ? new Date(syncStatus.last_sync_time).toLocaleString()
                       : '从未同步'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-theme-text-secondary">已同步文件</span>
-                  <span className="text-xs text-theme-text">{syncStatus.synced_files_count} 个</span>
+                  <span className="text-xs text-base-content/70">已同步文件</span>
+                  <span className="text-xs text-base-content">{syncStatus.synced_files_count} 个</span>
                 </div>
               </div>
             )}
@@ -291,7 +285,7 @@ export const SyncSettingsView: React.FC = () => {
             <button
               onClick={handleSync}
               disabled={syncing || !webdavConfig.enabled}
-              className="w-full px-4 py-2.5 bg-theme-success text-white text-sm rounded-md hover:opacity-90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+              className="btn btn-success btn-sm w-full"
             >
               {syncing ? (
                 <>
@@ -311,13 +305,13 @@ export const SyncSettingsView: React.FC = () => {
         {/* 同步结果 */}
         {syncResult && (
           <section>
-            <h3 className="text-sm font-semibold text-theme-text mb-3 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-base-content mb-3 flex items-center gap-2">
               <span>📋</span>
               <span>同步结果</span>
             </h3>
             <div className="space-y-2">
               {syncResult.uploaded.length > 0 && (
-                <div className="px-3 py-2 rounded-md bg-theme-accent/10 text-sm text-theme-accent">
+                <div className="px-3 py-2 rounded-md bg-primary/10 text-sm text-primary">
                   <div className="font-medium mb-1">已上传 ({syncResult.uploaded.length})</div>
                   {syncResult.uploaded.map((f) => (
                     <div key={f} className="text-xs">↑ {f}</div>
@@ -325,7 +319,7 @@ export const SyncSettingsView: React.FC = () => {
                 </div>
               )}
               {syncResult.downloaded.length > 0 && (
-                <div className="px-3 py-2 rounded-md bg-theme-success/10 text-sm text-theme-success">
+                <div className="px-3 py-2 rounded-md bg-success/10 text-sm text-success">
                   <div className="font-medium mb-1">已下载 ({syncResult.downloaded.length})</div>
                   {syncResult.downloaded.map((f) => (
                     <div key={f} className="text-xs">↓ {f}</div>
@@ -333,7 +327,7 @@ export const SyncSettingsView: React.FC = () => {
                 </div>
               )}
               {syncResult.errors.length > 0 && (
-                <div className="px-3 py-2 rounded-md bg-theme-error/10 text-sm text-theme-error">
+                <div className="px-3 py-2 rounded-md bg-error/10 text-sm text-error">
                   <div className="font-medium mb-1">错误 ({syncResult.errors.length})</div>
                   {syncResult.errors.map((e, i) => (
                     <div key={i} className="text-xs">✕ {e}</div>
@@ -344,7 +338,7 @@ export const SyncSettingsView: React.FC = () => {
                 syncResult.downloaded.length === 0 &&
                 syncResult.conflicts.length === 0 &&
                 syncResult.errors.length === 0 && (
-                  <div className="px-3 py-2 rounded-md bg-theme-bg text-sm text-theme-text-secondary">
+                  <div className="px-3 py-2 rounded-md bg-base-200 text-sm text-base-content/70">
                     所有文件已是最新状态
                   </div>
                 )}
@@ -355,7 +349,7 @@ export const SyncSettingsView: React.FC = () => {
         {/* 冲突解决 */}
         {syncResult && syncResult.conflicts.length > 0 && (
           <section>
-            <h3 className="text-sm font-semibold text-theme-text mb-3 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-base-content mb-3 flex items-center gap-2">
               <span>⚠️</span>
               <span>冲突文件 ({syncResult.conflicts.length})</span>
             </h3>
@@ -363,27 +357,27 @@ export const SyncSettingsView: React.FC = () => {
               {syncResult.conflicts.map((conflict) => (
                 <div
                   key={conflict.file_name}
-                  className="px-3 py-3 rounded-lg border border-yellow-300 bg-yellow-50/50"
+                  className="px-3 py-3 rounded-lg border border-warning bg-warning/10"
                 >
-                  <div className="text-sm font-medium text-theme-text mb-2">
+                  <div className="text-sm font-medium text-base-content mb-2">
                     {conflict.file_name}
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => resolveConflict(conflict.file_name, 'keep_local')}
-                      className="px-3 py-1 text-xs bg-theme-accent text-theme-accent-text rounded hover:bg-theme-accent-hover transition-colors"
+                      className="btn btn-primary btn-xs"
                     >
                       保留本地
                     </button>
                     <button
                       onClick={() => resolveConflict(conflict.file_name, 'keep_remote')}
-                      className="px-3 py-1 text-xs bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+                      className="btn btn-warning btn-xs"
                     >
                       保留远程
                     </button>
                     <button
                       onClick={() => resolveConflict(conflict.file_name, 'merge')}
-                      className="px-3 py-1 text-xs bg-theme-success text-white rounded hover:opacity-90 transition-colors"
+                      className="btn btn-success btn-xs"
                     >
                       合并
                     </button>
@@ -396,7 +390,7 @@ export const SyncSettingsView: React.FC = () => {
 
         {/* 错误提示 */}
         {error && (
-          <div className="px-3 py-2 rounded-md bg-theme-error/10 border border-theme-error/30 text-sm text-theme-error">
+          <div className="px-3 py-2 rounded-md bg-error/10 border border-error/30 text-sm text-error">
             {error}
           </div>
         )}

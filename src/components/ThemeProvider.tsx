@@ -9,7 +9,7 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  colorScheme: 'blue',
+  colorScheme: 'light',
   setColorScheme: () => {},
   isDark: false,
 });
