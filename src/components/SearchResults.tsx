@@ -3,8 +3,12 @@ import { invoke } from '@tauri-apps/api/core';
 import { useSearchStore } from '../stores';
 import { SearchResultItem } from './SearchResultItem';
 
-export const SearchResults: React.FC = () => {
-  const { results, isLoading, selectedIndex, setSelectedIndex, selectResult } = useSearchStore();
+interface SearchResultsProps {
+  onNavigate: (view: 'search' | 'plugins' | 'settings' | 'sync' | `plugin:${string}`) => void;
+}
+
+export const SearchResults: React.FC<SearchResultsProps> = ({ onNavigate }) => {
+  const { results, isLoading, selectedIndex, setSelectedIndex } = useSearchStore();
 
   if (isLoading) {
     return (
@@ -31,9 +35,8 @@ export const SearchResults: React.FC = () => {
           selected={index === selectedIndex}
           onClick={() => {
             setSelectedIndex(index);
-            // 记录插件使用频率（后端字段名为 plugin_id，前端类型定义为 pluginId）
-            invoke('record_usage', { pluginId: result.pluginId ?? (result as any).plugin_id }).catch(console.error);
-            selectResult();
+            invoke('record_usage', { pluginId: result.pluginId }).catch(console.error);
+            onNavigate(`plugin:${result.pluginId}`);
           }}
         />
       ))}

@@ -22,15 +22,20 @@ function App() {
   useEffect(() => {
     const handleKeyDown = async (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        const appWindow = getCurrentWindow();
-        await invoke('hide_window', { window: appWindow });
-        setCurrentView('search');
+        if (currentView === 'search') {
+          // 主界面按 Esc：隐藏窗口
+          const appWindow = getCurrentWindow();
+          await invoke('hide_window', { window: appWindow });
+        } else {
+          // 其他页面按 Esc：回到主界面
+          setCurrentView('search');
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [currentView]);
 
   useEffect(() => {
     const unlistenSettings = listen('open-settings', () => {

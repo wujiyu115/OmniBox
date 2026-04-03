@@ -5,6 +5,7 @@ use crate::plugins::manager::{Feature, PluginManager};
 use crate::usage::UsageTracker;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct SearchResult {
     pub id: String,
     pub title: String,

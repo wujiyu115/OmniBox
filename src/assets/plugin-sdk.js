@@ -56,5 +56,13 @@
     close: function () { return sendRequest('close', {}); }
   };
 
+  // 监听 Esc 键，通知主窗口返回（解决 iframe 焦点隔离问题）
+  window.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      window.parent.postMessage({ source: 'omnibox-plugin', type: 'escape' }, '*');
+    }
+  });
+
   window.parent.postMessage({ source: 'omnibox-plugin', type: 'ready' }, '*');
 })();

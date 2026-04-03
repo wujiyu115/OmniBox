@@ -95,6 +95,12 @@ export const PluginHost: React.FC<PluginHostProps> = ({ pluginId, onClose }) => 
 
     const iframe = iframeRef.current;
 
+    // 插件内按 Esc → 关闭插件，回到主界面
+    if (data.type === 'escape') {
+      onClose();
+      return;
+    }
+
     // 插件就绪 → 触发 onLoad 生命周期
     if (data.type === 'ready') {
       iframe?.contentWindow?.postMessage(

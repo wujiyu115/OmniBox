@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { invoke } from '@tauri-apps/api/core';
 import { SearchInput } from '../components/SearchInput';
 import { SearchResults } from '../components/SearchResults';
 import { useSearchStore, usePluginStore } from '../stores';
@@ -27,16 +28,21 @@ export const SearchView: React.FC<SearchViewProps> = ({ onNavigate }) => {
           e.preventDefault();
           navigateDown();
           break;
-        case 'Enter':
+        case 'Enter': {
           e.preventDefault();
-          selectResult();
+          const result = selectResult();
+          if (result) {
+            invoke('record_usage', { pluginId: result.pluginId }).catch(console.error);
+            onNavigate(`plugin:${result.pluginId}`);
+          }
           break;
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigateUp, navigateDown, selectResult]);
+  }, [navigateUp, navigateDown, selectResult, onNavigate]);
 
   const hasQuery = query.trim().length > 0;
 
@@ -50,7 +56,7 @@ export const SearchView: React.FC<SearchViewProps> = ({ onNavigate }) => {
 
       {hasQuery ? (
         /* 搜索后：纵向结果列表 */
-        <SearchResults />
+        <SearchResults onNavigate={onNavigate} />
       ) : (
         /* 未搜索：横向插件图标网格，高度自适应 */
         <div className="overflow-y-auto">
